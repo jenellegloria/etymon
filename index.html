@@ -283,7 +283,7 @@ const WORDS = [
        forms:['cate$','icate$'],
        words:[['educate',1],['communicate',1],['indicate',1],['dedicate',1],['syndicate',1],['advocate',1],['locate',1],['medicate',1],['fabricate',1],['implicate',2],['replicate',2],['complicate',1],['vindicate',2],['abdicate',2],['confiscate',2],['eradicate',2],['extricate',3],['inculcate',3],['prevaricate',3],['reciprocate',2],['authenticate',2],['communicate',1],['certificate',1],['duplicate',1],['predicate',2],['intricate',2]]},
     ],
-    prompt:'OB- (against) + FUS- (pour) + CATE (make/do). What murky experience needs a word?',
+    prompt:'OB- (against) + FUS- (pour) + CATE (make/do). Did these roots make you think of a word that REALLY needs to exist? Share it here.',
   },
   {
     id:2,
@@ -298,7 +298,7 @@ const WORDS = [
        forms:['tion$','sion$','ion$'],
        words:[['nation',1],['station',1],['action',1],['passion',1],['mention',1],['tension',1],['attention',1],['intention',1],['relation',1],['creation',1],['donation',1],['duration',1],['vacation',1],['location',1],['mutation',2],['notation',2],['formation',1],['migration',2],['narration',2],['salvation',2],['taxation',1],['emotion',1],['motion',1],['notion',1],['potion',2]]},
     ],
-    prompt:'GEST- (carry) + TION (act of). What act of bearing deserves a name?',
+    prompt:'GEST- (carry) + TION (act of). Did these roots make you think of a word that REALLY needs to exist? Share it here.',
   },
   {
     id:3,
@@ -316,7 +316,7 @@ const WORDS = [
        forms:['sis$'],
        words:[['analysis',1],['basis',1],['crisis',1],['diagnosis',1],['emphasis',1],['genesis',1],['hypothesis',1],['metamorphosis',2],['paralysis',2],['thesis',1],['ellipsis',2],['axis',1],['osmosis',2],['stasis',2],['catharsis',3],['mimesis',3],['praxis',3],['diegesis',3]]},
     ],
-    prompt:'SYN (together) + THES (place) + SIS (process). What placing-together needs naming?',
+    prompt:'SYN (together) + THES (place) + SIS (process). Did these roots make you think of a word that REALLY needs to exist? Share it here.',
   },
   {
     id:4,
@@ -329,7 +329,7 @@ const WORDS = [
        forms:['scope$'],
        words:[['microscope',1],['horoscope',1],['periscope',2],['kaleidoscope',2],['stethoscope',2],['gyroscope',2],['endoscope',2],['spectroscope',3],['oscilloscope',3],['scope',1]]},
     ],
-    prompt:'TELE- (far) + SCOPE (look). What distant observation needs naming?',
+    prompt:'TELE- (far) + SCOPE (look). Did these roots make you think of a word that REALLY needs to exist? Share it here.',
   },
   {
     id:5,
@@ -343,7 +343,7 @@ const WORDS = [
        forms:['escent$'],
        words:[['fluorescent',1],['phosphorescent',2],['adolescent',1],['convalescent',2],['obsolescent',3],['iridescent',2],['opalescent',3],['effervescent',2],['quiescent',3],['evanescent',3],['incandescent',2],['pearlescent',2],['tumescent',3],['senescent',3]]},
     ],
-    prompt:'LUMIN (light) + ESCENT (becoming). Something in the process of becoming light?',
+    prompt:'LUMIN (light) + ESCENT (becoming). Did these roots make you think of a word that REALLY needs to exist? Share it here.',
   },
   {
     id:6,
@@ -382,7 +382,7 @@ const WORDS = [
        forms:['adher','coher','inher','hesit','adhes','cohes'],
        words:[['adhere',2],['adhesive',1],['adhesion',2],['cohere',2],['coherent',1],['coherence',2],['incoherent',1],['inherent',1],['inhere',3],['hesitate',1],['hesitation',1],['hesitant',2],['cohesion',2],['cohesive',2],['inherently',2]]},
     ],
-    prompt:'CO- (together) + HAER- (stick). What sticks together but has no word yet?',
+    prompt:'CO- (together) + HAER- (stick). What sticks and/or is together but has no word yet?',
   },
   {
     id:9,
@@ -395,7 +395,7 @@ const WORDS = [
        forms:['fic','fact','fect','feas','fy$'],
        words:[['affect',1],['effect',1],['defect',1],['infect',1],['perfect',1],['fact',1],['factor',1],['factory',1],['manufacture',1],['beneficial',2],['terrific',1],['specific',1],['scientific',1],['prolific',2],['magnificent',2],['pacific',2],['proficient',2],['sufficient',1],['efficient',1],['feasible',2],['feat',2],['feature',1],['satisfy',1],['certify',1],['justify',1],['terrify',1],['clarify',1],['verify',1],['pacify',1]]},
     ],
-    prompt:'ART- (skill) + FIC- (make). What skillfully made thing still lacks a name?',
+    prompt:'ART- (skill) + FIC- (make). What skillful and/or made thing still lacks a name?',
   },
   {
     id:10,
@@ -408,7 +408,7 @@ const WORDS = [
        forms:['alesc','aliment','alumn','alma'],
        words:[['alumni',2],['alumnus',2],['aliment',3],['alimentary',3],['alma',2],['coalesce',2],['coalescent',3],['coalition',2],['adolescent',2],['adult',2]]},
     ],
-    prompt:'CO- (together) + AL- (nourish/grow). What things nourish each other into becoming one?',
+    prompt:'CO- (together) + AL- (nourish/grow). Did these roots make you think of a word that REALLY needs to exist? Share it here.',
   },
 ];
 
@@ -536,7 +536,7 @@ function init() {
     btn.addEventListener('click', () => revealRoot(parseInt(btn.dataset.ri), false));
   });
 
-  document.getElementById('coin-prompt').textContent = "Did today's roots make you think of a word that REALLY needs to exist? Share it here.";
+  document.getElementById('coin-prompt').textContent = "Did these roots make you think of a word that REALLY needs to exist? Share it here.";
 
   load();
   rebuildUI();
