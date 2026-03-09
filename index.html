@@ -731,7 +731,32 @@ function showFb(msg,type) {
 
 document.getElementById('sub-btn').addEventListener('click',()=>submit());
 document.getElementById('word-input').addEventListener('keydown',e=>{if(e.key==='Enter')submit();});
-document.getElementById('done-btn').addEventListener('click',()=>{done=true;save();showResults();});
+document.getElementById('done-btn').addEventListener('click', () => {
+  done = true;
+  save();
+  showResults();
+
+  // Log score anonymously to Google Sheet
+  const TRACKER_URL = 'https://script.google.com/macros/s/AKfycbzb5t3r8WZggFX6j7OnGvvfoBArZJlZRYyZ3fW2zbIQ8eD7Xus6E8COdfEDZGVHKiZv/exec';
+
+  const payload = {
+    date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+    puzzle_id: today.id,
+    word: today.segments.map(s => s.text).join(''),
+    score: calcScore(),
+    words_found: Object.values(foundByRoot).reduce((s, a) => s + a.length, 0),
+    roots_self_discovered: selfDiscovered.size,
+    roots_total: today.roots.length,
+  };
+
+  fetch(TRACKER_URL, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  }).catch(() => {}); // silent fail — never interrupts the game
+});
+
+
+
 
 // ── RESULTS ──────────────────────────────────────────────────────
 function showResults() {
