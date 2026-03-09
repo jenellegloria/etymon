@@ -784,7 +784,7 @@ function showResults() {
     const self=selfDiscovered.has(i)?'🌟':'';
     share+=`${emojis[i%5]}${self} ${r.name} ${c} word${c!==1?'s':''}\n`;
   });
-  share+=`Score: ${score} pts\nplay at etymon.app`;
+  share+=`Score: ${score} pts\nplay at https://jenellegloria.github.io/etymon`;
   document.getElementById('share-card').textContent=share;
 
   // Root breakdown
