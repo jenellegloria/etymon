@@ -181,6 +181,7 @@
   <div class="wordmark">Etymon</div>
   <div class="header-right">
     <span class="puzzle-label" id="puzzle-label"></span>
+    <a href="archive.html" style="font-size:.72rem;color:var(--ink-light);letter-spacing:.08em;text-decoration:none;transition:color .15s;" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--ink-light)'">Archive</a>
     <div class="score-display">Score: <span id="score-hdr">0</span></div>
   </div>
 </header>
@@ -271,32 +272,29 @@ const C = [
 const WORDS = [
   {
     id:1,
-    segments:[{text:'OB',ri:0},{text:'FUS',ri:1},{text:'CATE',ri:2}],
+    segments:[{text:'OB',ri:0},{text:'FUSC',ri:1},{text:'ATE',ri:-1}],
     roots:[
       {name:'OB-',meaning:'against, toward, in the way of',origin:'Latin ob, "against, before"',
        forms:['^ob'],
        words:[['object',1],['obstruct',1],['obscure',1],['obtain',1],['observe',1],['obvious',1],['oblique',2],['obstacle',1],['obliterate',2],['obstinate',2],['obtrude',3],['obverse',3],['obviate',2],['oblivious',1],['obsess',1],['occlude',3],['oppose',1],['occur',1]]},
-      {name:'FUS-',meaning:'to pour, melt, blend',origin:'Latin fundere, "to pour"',
-       forms:['fus','fund','foun'],
-       words:[['fuse',1],['fusion',1],['confuse',1],['diffuse',2],['infuse',1],['transfuse',2],['refuse',1],['profuse',2],['effuse',3],['suffuse',3],['confound',2],['profound',2],['foundry',2],['refusal',1],['confusion',1],['diffusion',2],['infusion',2],['transfusion',2],['profusion',2]]},
-      {name:'-CATE',meaning:'to make, do, cause',origin:'Latin -care / -atus, causative verb suffix',
-       forms:['cate$','icate$'],
-       words:[['educate',1],['communicate',1],['indicate',1],['dedicate',1],['syndicate',1],['advocate',1],['locate',1],['medicate',1],['fabricate',1],['implicate',2],['replicate',2],['complicate',1],['vindicate',2],['abdicate',2],['confiscate',2],['eradicate',2],['extricate',3],['inculcate',3],['prevaricate',3],['reciprocate',2],['authenticate',2],['communicate',1],['certificate',1],['duplicate',1],['predicate',2],['intricate',2]]},
+      {name:'FUSC-',meaning:'to darken, make dusky',origin:'Latin fuscus, "dark, dusky" — cognate with English "dusk"',
+       forms:['fusc'],
+       words:[['obfuscation',1],['obfuscatory',2],['fuscous',2],['subfusc',3],['infuscate',3]]},
     ],
-    prompt:'OB- (against) + FUS- (pour) + CATE (make/do). Did these roots make you think of a word that REALLY needs to exist? Share it here.',
+    prompt:'OB- (against) + FUSC- (dark). Note: FUSC- has nothing to do with FUS- (to pour) — they just look alike. Coin a word about false appearances, darkness, or things that aren\'t what they seem.',
   },
   {
     id:2,
-    segments:[{text:'GES',ri:0},{text:'TA',ri:-1},{text:'TION',ri:1}],
+    segments:[{text:'GEST',ri:0},{text:'A',ri:-1},{text:'TION',ri:1}],
     roots:[
       {name:'GEST-',meaning:'to carry, bear, do',origin:'Latin gerere / gestare',
        // gest- is the consistent morpheme across all derivatives
        forms:['gest'],
-       words:[['gesture',1],['gestate',2],['ingest',1],['digest',1],['suggest',1],['congest',1],['jest',2],['gist',2],['digestion',1],['suggestion',1],['congestion',1],['gesticulate',3],['digestive',1],['congested',1],['suggestive',1],['jester',2]]},
+       words:[['gesture',1],['gestate',2],['ingest',1],['digest',1],['suggest',1],['congest',1],['jest',2],['digestion',1],['suggestion',1],['congestion',1],['gesticulate',3],['digestive',1],['congested',1],['suggestive',1],['jester',2]]},
       {name:'-TION',meaning:'act of, process of, result of',origin:'Latin -tio, suffix of action',
        // -tion, -sion, and bare -ion are all reflexes of the same Latin suffix
        forms:['tion$','sion$','ion$'],
-       words:[['nation',1],['station',1],['action',1],['passion',1],['mention',1],['tension',1],['attention',1],['intention',1],['relation',1],['creation',1],['donation',1],['duration',1],['vacation',1],['location',1],['mutation',2],['notation',2],['formation',1],['migration',2],['narration',2],['salvation',2],['taxation',1],['emotion',1],['motion',1],['notion',1],['potion',2]]},
+       words:[['nation',1],['station',1],['action',1],['passion',1],['mention',1],['tension',1],['attention',1],['intention',1],['relation',1],['creation',1],['donation',1],['duration',1],['vacation',1],['location',1],['mutation',2],['notation',2],['formation',1],['migration',2],['narration',2],['salvation',2],['taxation',1],['emotion',1],['motion',1],['notion',1]]},
     ],
     prompt:'GEST- (carry) + TION (act of). Did these roots make you think of a word that REALLY needs to exist? Share it here.',
   },
@@ -469,6 +467,28 @@ function load() {
   } catch(e){}
 }
 
+function updateStreak() {
+  const data = JSON.parse(localStorage.getItem('etymon_streak') || '{}');
+  const lastId = data.lastId || 0;
+  const streak = data.streak || 0;
+
+  let newStreak;
+  if (lastId === today.id - 1) {
+    newStreak = streak + 1;       // played yesterday, extend streak
+  } else if (lastId === today.id) {
+    return;                        // already counted today, do nothing
+  } else {
+    newStreak = 1;                 // gap in play, reset
+  }
+
+  localStorage.setItem('etymon_streak', JSON.stringify({
+    lastId: today.id,
+    streak: newStreak,
+  }));
+
+  return newStreak;
+}
+
 // ── INIT ─────────────────────────────────────────────────────────
 function init() {
   document.getElementById('puzzle-label').textContent =
@@ -625,6 +645,38 @@ async function isRealWord(word) {
   }
 }
 
+// Strips common inflectional suffixes to find the base form.
+// e.g. synthesized/synthesizing/synthesizer → synthesize
+//      confusion/confusions → confuse, running → run
+function stemWord(w) {
+  const rules = [
+    [/izations?$/, 'ize'],  [/ising$/, 'ise'],   [/isation$/, 'ise'],
+    [/nesses$/, ''],         [/ness$/, ''],
+    [/ments$/, ''],          [/ment$/, ''],
+    [/ations?$/, 'ate'],     [/tions?$/, 'te'],    [/ions?$/, 'e'],
+    [/izers?$/, 'ize'],      [/isers?$/, 'ise'],
+    [/izing$/, 'ize'],       [/ising$/, 'ise'],
+    [/ily$/, 'y'],           [/ly$/, ''],
+    [/iest$/, 'y'],          [/ier$/, 'y'],
+    [/edly$/, ''],
+    [/ers?$/, ''],
+    [/ied$/, 'y'],           [/ies$/, 'y'],
+    [/est$/, ''],
+    // -ing: drop doubled consonant or just -ing
+    [/([a-z])\1ing$/, '$1'], [/ing$/, ''],
+    // -ed: drop doubled consonant or just -ed
+    [/([a-z])\1ed$/, '$1'],  [/ed$/, ''],
+    [/s$/, ''],
+  ];
+  for (const [pat, rep] of rules) {
+    if (pat.test(w)) {
+      const stem = w.replace(pat, rep);
+      if (stem.length >= 3) return stem;
+    }
+  }
+  return w;
+}
+
 // Returns the root index whose morpheme forms match this word, or null.
 function rootIndexByForms(word) {
   for(let i=0;i<today.roots.length;i++) {
@@ -659,9 +711,13 @@ async function submit() {
   input.value = '';
   if(!raw || raw.length < 2) return;
 
-  // Already found?
+  // Already found? (exact or stemmed variant)
+  const rawStem = stemWord(raw);
   for(let i=0;i<today.roots.length;i++) {
-    if(foundByRoot[i].find(e=>e.word===raw)) { showFb(`"${raw}" already found!`,'already'); return; }
+    const exact = foundByRoot[i].find(e => e.word === raw);
+    if(exact) { showFb(`"${raw}" already found!`,'already'); return; }
+    const variant = foundByRoot[i].find(e => stemWord(e.word) === rawStem);
+    if(variant) { showFb(`"${raw}" is a variant of "${variant.word}" — already found!`,'already'); return; }
   }
   if(unmatched.includes(raw)) { showFb(`Already tried "${raw}".`,'already'); return; }
 
@@ -773,6 +829,12 @@ function showResults() {
   document.getElementById('res-score-big').textContent = score;
   document.getElementById('res-summary').innerHTML =
     `<span>${total}</span> word${total!==1?'s':''} found across <span>${revealedRoots.size}</span> of ${today.roots.length} roots`;
+    const streak = updateStreak(); 
+    if (streak && streak > 1) {
+  document.getElementById('res-summary').insertAdjacentHTML('afterend',
+    `<div style="font-size:.8rem;color:var(--ink-light);margin-bottom:1rem">🔥 ${streak} day streak</div>`
+  );
+}
 
   // Score breakdown
   const sbRows = document.getElementById('sb-rows');

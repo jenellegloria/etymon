@@ -152,6 +152,8 @@
     line-height: 1;
     margin-bottom: .6rem;
   }
+  .entry-word .seg-root { /* colored by inline style */ }
+  .entry-word .seg-gray { color: #C0BDB8; }
 
   /* Root pills */
   .entry-roots {
@@ -233,6 +235,16 @@
     font-size: .8rem;
     color: var(--ink-light);
     font-style: italic;
+  }
+
+  .entry-note {
+    margin-top: .85rem;
+    font-size: .72rem;
+    color: var(--ink-light);
+    font-style: italic;
+    line-height: 1.6;
+    padding-left: .7rem;
+    border-left: 2px solid var(--border);
   }
 
   /* Stats row */
@@ -345,13 +357,19 @@ const ARCHIVE = [
     id: 1,
     date: "March 9, 2026",
     word: "OBFUSCATE",
+    segments: [
+      { text: "OB", ri: 0 },
+      { text: "FUSC", ri: 1 },
+      { text: "ATE", ri: -1 },
+    ],
     roots: [
       { name: "OB-", meaning: "against, toward, in the way of", color: 0 },
-      { name: "FUS-", meaning: "to pour, melt, blend", color: 1 },
-      { name: "-CATE", meaning: "action, process", color: 2 },
+      { name: "FUSC-", meaning: "to darken, make dusky", color: 1 },
     ],
+    topScore: 82,
+    note: "Note: the version live on Day 1 incorrectly listed FUS- (to pour, from Latin fundere) as a root. FUSC- (dark, from Latin fuscus) and FUS- are unrelated — they just look alike. The archive reflects the corrected etymology.",
     coins: [
-      { word: "obfunym", def: "a word designed to hide or skirt around the truth", author: "anonymous" }
+      { word: "obfuscnym", def: "a name that blocks understanding of the thing it's naming", author: "anonymous" }
     ],
   },
 
@@ -368,6 +386,16 @@ const COLORS = [
   { cls: 'r3', hex: '#7C3AED', pale: '#EDE9FE' },
   { cls: 'r4', hex: '#DB2777', pale: '#FCE7F3' },
 ];
+
+function renderWord(entry) {
+  if (!entry.segments || !entry.segments.length) return entry.word;
+  return entry.segments.map(seg => {
+    if (seg.ri === -1) return `<span class="seg-gray">${seg.text}</span>`;
+    const c = COLORS[entry.roots[seg.ri] ? entry.roots.findIndex((_,i) => i === seg.ri) : 0];
+    const color = (COLORS[seg.ri] || COLORS[0]).hex;
+    return `<span class="seg-root" style="color:${color}">${seg.text}</span>`;
+  }).join('');
+}
 
 function render() {
   const container = document.getElementById('archive');
@@ -407,14 +435,13 @@ function render() {
     }
 
     // Stats HTML
-    let statsHTML = '';
-    if (entry.stats) {
-      const parts = [];
-      if (entry.stats.players != null) parts.push(`<div class="estat"><span>${entry.stats.players}</span>player${entry.stats.players !== 1 ? 's' : ''}</div>`);
-      if (entry.stats.topScore != null) parts.push(`<div class="estat"><span>${entry.stats.topScore}</span>top score</div>`);
-      if (entry.stats.totalWords != null) parts.push(`<div class="estat"><span>${entry.stats.totalWords}</span>total words found</div>`);
-      if (parts.length) statsHTML = `<div class="entry-stats">${parts.join('')}</div>`;
-    }
+	let statsHTML = '';
+	if (entry.topScore != null) {
+  	statsHTML = `<div class="entry-stats"><div class="estat"><span>${entry.topScore}</span>high score</div></div>`;
+	}
+    const noteHTML = entry.note
+      ? `<div class="entry-note">${entry.note}</div>`
+      : '';
 
     el.innerHTML = `
       <div class="entry-num">
@@ -422,10 +449,11 @@ function render() {
         <span class="num-date">${entry.date}</span>
       </div>
       <div class="entry-body">
-        <div class="entry-word">${entry.word}</div>
+        <div class="entry-word">${renderWord(entry)}</div>
         <div class="entry-roots">${rootsHTML}</div>
         ${coinedHTML}
         ${statsHTML}
+        ${noteHTML}
       </div>
     `;
 
