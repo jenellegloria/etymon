@@ -271,18 +271,19 @@ const C = [
 const WORDS = [
   {
     id:1,
-    segments:[{text:'OB',ri:0},{text:'FUS',ri:1},{text:'CATE',ri:-1}],
+    segments:[{text:'OB',ri:0},{text:'FUS',ri:1},{text:'CATE',ri:2}],
     roots:[
       {name:'OB-',meaning:'against, toward, in the way of',origin:'Latin ob, "against, before"',
-       // forms: pure ob- prefix; assimilated variants (oc-, of-, op-) covered by curated list
        forms:['^ob'],
        words:[['object',1],['obstruct',1],['obscure',1],['obtain',1],['observe',1],['obvious',1],['oblique',2],['obstacle',1],['obliterate',2],['obstinate',2],['obtrude',3],['obverse',3],['obviate',2],['oblivious',1],['obsess',1],['occlude',3],['oppose',1],['occur',1]]},
       {name:'FUS-',meaning:'to pour, melt, blend',origin:'Latin fundere, "to pour"',
-       // fus- (fuse, fusion, diffuse), fund- (profound, foundry), foun- (confound, fountain)
        forms:['fus','fund','foun'],
        words:[['fuse',1],['fusion',1],['confuse',1],['diffuse',2],['infuse',1],['transfuse',2],['refuse',1],['profuse',2],['effuse',3],['suffuse',3],['confound',2],['profound',2],['foundry',2],['refusal',1],['confusion',1],['diffusion',2],['infusion',2],['transfusion',2],['profusion',2]]},
+      {name:'-CATE',meaning:'to make, do, cause',origin:'Latin -care / -atus, causative verb suffix',
+       forms:['cate$','icate$'],
+       words:[['educate',1],['communicate',1],['indicate',1],['dedicate',1],['syndicate',1],['advocate',1],['locate',1],['medicate',1],['fabricate',1],['implicate',2],['replicate',2],['complicate',1],['vindicate',2],['abdicate',2],['confiscate',2],['eradicate',2],['extricate',3],['inculcate',3],['prevaricate',3],['reciprocate',2],['authenticate',2],['communicate',1],['certificate',1],['duplicate',1],['predicate',2],['intricate',2]]},
     ],
-    prompt:'OB- (against) + FUS- (pour). What experience needs a word?',
+    prompt:'OB- (against) + FUS- (pour) + CATE (make/do). What murky experience needs a word?',
   },
   {
     id:2,
