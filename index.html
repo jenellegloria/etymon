@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Etymon</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F8F7F4; --bg2: #EFEFEC; --ink: #111010; --ink-mid: #5A5755; --ink-light: #AAA8A4; --border: #E0DDD8;
+    --r0:#C026D3; --r0p:#FAE8FF;
+    --r1:#EA580C; --r1p:#FFF0E6;
+    --r2:#65A30D; --r2p:#ECFCCB;
+    --r3:#7C3AED; --r3p:#EDE9FE;
+    --r4:#DB2777; --r4p:#FCE7F3;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--ink);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+
+  /* HEADER */
+  header{width:100%;max-width:680px;display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.5rem;border-bottom:1px solid var(--border);}
+  .wordmark{font-size:.85rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;}
+  .header-right{display:flex;align-items:center;gap:1rem;}
+  .puzzle-label{font-size:.72rem;color:var(--ink-light);letter-spacing:.08em;}
+  .score-display{font-size:.85rem;font-weight:600;color:var(--ink);}
+  .score-display span{font-family:'Instrument Serif',serif;font-size:1.2rem;}
+
+  /* MAIN */
+  main{width:100%;max-width:680px;padding:0 1.5rem;flex:1;display:flex;flex-direction:column;}
+
+  /* WORD */
+  .word-section{padding:2.2rem 0 1.4rem;text-align:center;}
+  .target-word{font-family:'DM Sans',sans-serif;font-size:clamp(2.4rem,9vw,5rem);font-weight:600;letter-spacing:-.03em;line-height:1;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;margin-bottom:1rem;}
+  .word-seg{display:inline-block;padding:2px 3px;border-radius:5px;transition:color .35s,background .35s;color:var(--ink);}
+  .word-seg.connector{color:#C8C5BF;}
+  .word-seg.discovered{animation:pop .4s ease;}
+  @keyframes pop{0%{transform:scale(1)}45%{transform:scale(1.09)}100%{transform:scale(1)}}
+  .word-seg.r0.discovered{color:var(--r0);background:var(--r0p);}
+  .word-seg.r1.discovered{color:var(--r1);background:var(--r1p);}
+  .word-seg.r2.discovered{color:var(--r2);background:var(--r2p);}
+  .word-seg.r3.discovered{color:var(--r3);background:var(--r3p);}
+  .word-seg.r4.discovered{color:var(--r4);background:var(--r4p);}
+
+  /* ROOT PILLS ROW */
+  .root-pills{display:flex;justify-content:center;gap:.5rem;flex-wrap:wrap;min-height:1.8rem;}
+  .rpill{font-size:.7rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;padding:.22rem .7rem;border-radius:20px;border:2px solid;opacity:0;transform:translateY(5px);transition:opacity .3s,transform .3s;cursor:default;}
+  .rpill.show{opacity:1;transform:translateY(0);}
+  .rpill.r0{background:var(--r0p);color:var(--r0);border-color:var(--r0);}
+  .rpill.r1{background:var(--r1p);color:var(--r1);border-color:var(--r1);}
+  .rpill.r2{background:var(--r2p);color:var(--r2);border-color:var(--r2);}
+  .rpill.r3{background:var(--r3p);color:var(--r3);border-color:var(--r3);}
+  .rpill.r4{background:var(--r4p);color:var(--r4);border-color:var(--r4);}
+
+  /* ROOT INFO CARDS — one per root, shown after discover or reveal */
+  .root-cards{display:flex;flex-direction:column;gap:.45rem;margin-bottom:1rem;}
+  .rcard{display:none;background:white;border:1.5px solid var(--border);border-radius:8px;padding:.75rem 1rem;}
+  .rcard.show{display:block;}
+  .rcard.r0{border-left:4px solid var(--r0);}
+  .rcard.r1{border-left:4px solid var(--r1);}
+  .rcard.r2{border-left:4px solid var(--r2);}
+  .rcard.r3{border-left:4px solid var(--r3);}
+  .rcard.r4{border-left:4px solid var(--r4);}
+  .rcard-top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:.15rem;}
+  .rcard-name{font-size:.75rem;font-weight:700;letter-spacing:.06em;}
+  .rcard-name.r0{color:var(--r0)}.rcard-name.r1{color:var(--r1)}.rcard-name.r2{color:var(--r2)}.rcard-name.r3{color:var(--r3)}.rcard-name.r4{color:var(--r4)}
+  .rcard-bonus{font-size:.68rem;font-weight:600;padding:.12rem .45rem;border-radius:20px;white-space:nowrap;}
+  .rcard-bonus.earned{background:#DCFCE7;color:#15803D;}
+  .rcard-bonus.missed{background:var(--bg2);color:var(--ink-light);}
+  .rcard-meaning{font-size:.83rem;color:var(--ink);margin-bottom:.1rem;line-height:1.4;}
+  .rcard-origin{font-size:.71rem;color:var(--ink-light);font-style:italic;}
+  /* Reveal button inside each undiscovered root area */
+  .reveal-root-btn{font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:500;padding:.22rem .65rem;border-radius:20px;border:1.5px solid var(--border);background:white;color:var(--ink-mid);cursor:pointer;transition:all .15s;margin-left:.5rem;}
+  .reveal-root-btn:hover{border-color:var(--ink-mid);color:var(--ink);}
+
+  /* Undiscovered root hint row */
+  .root-hints{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem;}
+  .root-hint{display:flex;align-items:center;gap:.3rem;background:white;border:1.5px dashed var(--border);border-radius:8px;padding:.45rem .75rem;font-size:.75rem;color:var(--ink-light);}
+  .root-hint.hidden-root{}
+
+  /* STATS */
+  .stats-row{display:flex;align-items:center;justify-content:space-between;padding:.55rem 0;border-top:1px solid var(--border);margin-bottom:.7rem;}
+  .stat-num{font-family:'Instrument Serif',serif;font-size:1.5rem;line-height:1;color:var(--ink);margin-right:.28rem;}
+  .stat-label{font-size:.68rem;color:var(--ink-light);letter-spacing:.04em;}
+  .roots-status{font-size:.7rem;color:var(--ink-light);}
+
+  /* INPUT */
+  .input-row{display:flex;gap:.5rem;margin-bottom:.45rem;}
+  .word-input{flex:1;background:white;border:1.5px solid var(--border);border-radius:8px;color:var(--ink);font-family:'DM Sans',sans-serif;font-size:1rem;padding:.7rem 1rem;outline:none;transition:border-color .15s;}
+  .word-input:focus{border-color:var(--ink-mid);}
+  .word-input::placeholder{color:var(--ink-light);}
+  .sub-btn{background:var(--ink);border:none;border-radius:8px;color:white;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:500;padding:.7rem 1.1rem;cursor:pointer;transition:background .15s;}
+  .sub-btn:hover{background:#333;}
+
+  .feedback{font-size:.78rem;min-height:1.1rem;margin-bottom:.7rem;text-align:center;color:var(--ink-light);font-style:italic;}
+  .feedback.good{color:#16A34A;font-style:normal;font-weight:500;}
+  .feedback.great{color:#7C3AED;font-style:normal;font-weight:600;}
+  .feedback.bad{color:#DC2626;font-style:normal;}
+  .feedback.already{color:var(--ink-mid);font-style:normal;}
+
+  /* FOUND WORDS */
+  .found-area{display:flex;flex-direction:column;gap:.55rem;margin-bottom:.6rem;}
+  .root-col{display:none;}
+  .root-col.show{display:block;}
+  .rcol-header{font-size:.67rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.3rem;}
+  .rcol-header.r0{color:var(--r0)}.rcol-header.r1{color:var(--r1)}.rcol-header.r2{color:var(--r2)}.rcol-header.r3{color:var(--r3)}.rcol-header.r4{color:var(--r4)}
+  .words-flow{display:flex;flex-wrap:wrap;gap:.3rem;}
+  .ftag{font-size:.78rem;font-weight:500;padding:.2rem .6rem;border-radius:5px;animation:tagIn .22s ease;display:flex;align-items:center;gap:.3rem;}
+  @keyframes tagIn{from{transform:translateX(-6px);opacity:0}to{transform:translateX(0);opacity:1}}
+  .ftag.r0{background:var(--r0p);color:var(--r0)}.ftag.r1{background:var(--r1p);color:var(--r1)}.ftag.r2{background:var(--r2p);color:var(--r2)}.ftag.r3{background:var(--r3p);color:var(--r3)}.ftag.r4{background:var(--r4p);color:var(--r4)}
+  .ftag-pts{font-size:.6rem;opacity:.65;font-weight:400;}
+
+  .unmatched-row{display:none;flex-wrap:wrap;gap:.28rem;padding:.45rem 0;border-top:1px dashed var(--border);margin-bottom:.4rem;}
+  .unmatched-row.show{display:flex;}
+  .utag{font-size:.75rem;padding:.18rem .5rem;border-radius:5px;background:var(--bg2);color:var(--ink-light);text-decoration:line-through;text-decoration-color:var(--border);animation:tagIn .22s ease;}
+
+  /* DONE BUTTON */
+  .done-btn{width:100%;background:white;border:1.5px solid var(--border);border-radius:8px;color:var(--ink-mid);font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:500;padding:.8rem;cursor:pointer;transition:all .2s;margin-bottom:2.5rem;margin-top:.5rem;}
+  .done-btn:hover{border-color:var(--ink);color:var(--ink);}
+
+  /* RESULTS */
+  #results{display:none;flex-direction:column;align-items:center;padding:3rem 1.5rem 2.5rem;max-width:680px;width:100%;}
+  #results.show{display:flex;}
+  .res-eyebrow{font-size:.7rem;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-light);margin-bottom:.5rem;}
+  .res-word{font-family:'DM Sans',sans-serif;font-size:clamp(2rem,8vw,3.5rem);font-weight:600;letter-spacing:-.02em;margin-bottom:.3rem;}
+  .res-score-big{font-family:'Instrument Serif',serif;font-size:3.5rem;line-height:1;color:var(--ink);margin-bottom:.2rem;}
+  .res-score-label{font-size:.72rem;color:var(--ink-light);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem;}
+  .res-summary{font-size:.85rem;color:var(--ink-mid);margin-bottom:1.5rem;text-align:center;line-height:1.6;}
+  .res-summary span{color:var(--ink);font-weight:600;}
+
+  /* Score breakdown */
+  .score-breakdown{width:100%;max-width:400px;background:white;border:1.5px solid var(--border);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1.2rem;}
+  .sb-title{font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-light);margin-bottom:.7rem;}
+  .sb-row{display:flex;justify-content:space-between;align-items:center;padding:.28rem 0;border-bottom:1px solid var(--border);font-size:.82rem;}
+  .sb-row:last-child{border-bottom:none;}
+  .sb-row.bonus{color:#15803D;font-weight:500;}
+  .sb-row.total{font-weight:600;font-size:.88rem;padding-top:.5rem;margin-top:.2rem;}
+  .sb-pts{font-family:'Instrument Serif',serif;font-size:1rem;}
+
+  /* Share */
+  .share-card{background:white;border:1.5px solid var(--border);border-radius:10px;padding:1.1rem 1.3rem;width:100%;max-width:400px;font-size:.82rem;line-height:1.9;white-space:pre-wrap;margin-bottom:.7rem;}
+  .share-btn{background:var(--ink);border:none;border-radius:8px;color:white;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:500;padding:.7rem 2rem;cursor:pointer;margin-bottom:1.8rem;transition:background .15s;}
+  .share-btn:hover{background:#333;}
+
+  /* Coin a word — on results */
+  .coin-section{width:100%;max-width:400px;background:white;border:1.5px solid var(--border);border-radius:10px;padding:1.1rem 1.2rem;margin-bottom:1.2rem;}
+  .coin-title{font-size:.75rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;margin-bottom:.3rem;}
+  .coin-prompt{font-size:.8rem;color:var(--ink-mid);font-style:italic;margin-bottom:.75rem;line-height:1.5;}
+  .coin-fields{display:flex;gap:.4rem;flex-wrap:wrap;}
+  .iname{font-family:'Instrument Serif',serif;font-size:1rem;font-style:italic;flex:1;min-width:90px;background:var(--bg);border:1.5px solid var(--border);border-radius:6px;color:var(--ink);padding:.5rem .7rem;outline:none;}
+  .idef{font-family:'DM Sans',sans-serif;font-size:.84rem;flex:2;min-width:130px;background:var(--bg);border:1.5px solid var(--border);border-radius:6px;color:var(--ink);padding:.5rem .7rem;outline:none;}
+  .iname:focus,.idef:focus{border-color:var(--ink-mid);}
+  .iname::placeholder,.idef::placeholder{color:var(--ink-light);font-style:italic;}
+  .coin-btn{font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:500;padding:.5rem .9rem;border-radius:6px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer;transition:all .15s;white-space:nowrap;}
+  .coin-btn:hover{background:var(--ink);color:white;}
+  .coined-card{display:none;margin-top:.8rem;padding:.8rem;background:var(--bg);border-radius:7px;border:1px solid var(--border);}
+  .coined-card.show{display:block;}
+  .coined-word{font-family:'Instrument Serif',serif;font-size:1.25rem;font-style:italic;margin-bottom:.15rem;}
+  .coined-def{font-size:.82rem;color:var(--ink-mid);line-height:1.5;margin-bottom:.55rem;}
+  .vote-row{display:flex;align-items:center;gap:.65rem;}
+  .vote-btn{font-family:'DM Sans',sans-serif;font-size:.72rem;padding:.25rem .65rem;border-radius:20px;border:1.5px solid var(--border);background:white;color:var(--ink-mid);cursor:pointer;transition:all .15s;}
+  .vote-btn:hover{border-color:var(--ink);color:var(--ink);}
+  .vote-btn.voted{background:var(--ink);color:white;border-color:var(--ink);}
+  .vote-note{font-size:.7rem;color:var(--ink-light);font-style:italic;}
+
+  /* Results breakdown */
+  .res-bd{width:100%;max-width:400px;}
+  .res-bd h3{font-size:.67rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-light);margin-bottom:.7rem;}
+  .rb-block{background:white;border:1.5px solid var(--border);border-radius:8px;padding:.8rem 1rem;margin-bottom:.45rem;}
+  .rb-root{font-size:.73rem;font-weight:700;letter-spacing:.06em;margin-bottom:.15rem;}
+  .rb-meaning{font-size:.76rem;color:var(--ink-light);margin-bottom:.45rem;font-style:italic;}
+  .rb-words{display:flex;flex-wrap:wrap;gap:.28rem;}
+  .rb-w{font-size:.72rem;padding:.17rem .48rem;border-radius:4px;}
+  .next-note{margin-top:1.5rem;font-size:.75rem;color:var(--ink-light);font-style:italic;}
+
+  @media(max-width:480px){.target-word{font-size:2.1rem;}main{padding:0 1rem;}#results{padding:2rem 1rem 2rem;}.coin-fields{flex-direction:column;}.iname,.idef{min-width:0;}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wordmark">Etymon</div>
+  <div class="header-right">
+    <span class="puzzle-label" id="puzzle-label"></span>
+    <div class="score-display">Score: <span id="score-hdr">0</span></div>
+  </div>
+</header>
+
+<main id="game">
+  <div class="word-section">
+    <div class="target-word" id="target-word"></div>
+    <div class="root-pills" id="root-pills"></div>
+  </div>
+
+  <!-- Root info cards — one per root, revealed independently -->
+  <div class="root-cards" id="root-cards"></div>
+
+  <!-- Undiscovered root hints -->
+  <div class="root-hints" id="root-hints"></div>
+
+  <div class="stats-row">
+    <div><span class="stat-num" id="wcount">0</span><span class="stat-label">words found</span></div>
+    <span class="roots-status" id="roots-status"></span>
+    <div><span class="stat-num" id="rcount">0</span><span class="stat-label">roots lit</span></div>
+  </div>
+
+  <div class="input-row">
+    <input type="text" class="word-input" id="word-input" placeholder="Type any word you think shares a root…" autocomplete="off" autocorrect="off" spellcheck="false"/>
+    <button class="sub-btn" id="sub-btn">→</button>
+  </div>
+  <div class="feedback" id="feedback"></div>
+
+  <div class="found-area" id="found-area"></div>
+  <div class="unmatched-row" id="unmatched-row"></div>
+
+  <button class="done-btn" id="done-btn">I'm done — see results →</button>
+</main>
+
+<!-- RESULTS -->
+<div id="results">
+  <div class="res-eyebrow" id="res-date"></div>
+  <div class="res-word" id="res-word"></div>
+  <div class="res-score-big" id="res-score-big"></div>
+  <div class="res-score-label">points</div>
+  <div class="res-summary" id="res-summary"></div>
+
+  <!-- Score breakdown -->
+  <div class="score-breakdown" id="score-breakdown">
+    <div class="sb-title">How you scored</div>
+    <div id="sb-rows"></div>
+  </div>
+
+  <!-- Share -->
+  <div class="share-card" id="share-card"></div>
+  <button class="share-btn" id="share-btn">Copy result</button>
+
+  <!-- Coin a word -->
+  <div class="coin-section">
+    <div class="coin-title">Coin a word</div>
+    <div class="coin-prompt" id="coin-prompt"></div>
+    <div class="coin-fields">
+      <input type="text" class="iname" id="iname" placeholder="your word…" autocorrect="off" spellcheck="false"/>
+      <input type="text" class="idef" id="idef" placeholder="what it means…"/>
+      <button class="coin-btn" id="coin-btn">Coin it</button>
+    </div>
+    <div class="coined-card" id="coined-card">
+      <div class="coined-word" id="coined-word"></div>
+      <div class="coined-def" id="coined-def"></div>
+      <div class="vote-row">
+        <button class="vote-btn" id="vote-btn">👍 Should be real</button>
+        <span class="vote-note" id="vote-note"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="res-bd" id="res-bd"></div>
+  <div class="next-note" id="next-note"></div>
+</div>
+
+<script>
+// ── COLORS ───────────────────────────────────────────────────────
+const C = [
+  {cls:'r0',hex:'#C026D3',pale:'#FAE8FF'},
+  {cls:'r1',hex:'#EA580C',pale:'#FFF0E6'},
+  {cls:'r2',hex:'#65A30D',pale:'#ECFCCB'},
+  {cls:'r3',hex:'#7C3AED',pale:'#EDE9FE'},
+  {cls:'r4',hex:'#DB2777',pale:'#FCE7F3'},
+];
+
+// Word tiers: 1=common, 2=good find, 3=rare/impressive
+// Each word entry: [word, tier]
+const WORDS = [
+  {
+    id:1,
+    segments:[{text:'OB',ri:0},{text:'FUS',ri:1},{text:'CATE',ri:-1}],
+    roots:[
+      {name:'OB-',meaning:'against, toward, in the way of',origin:'Latin ob, "against, before"',
+       // forms: pure ob- prefix; assimilated variants (oc-, of-, op-) covered by curated list
+       forms:['^ob'],
+       words:[['object',1],['obstruct',1],['obscure',1],['obtain',1],['observe',1],['obvious',1],['oblique',2],['obstacle',1],['obliterate',2],['obstinate',2],['obtrude',3],['obverse',3],['obviate',2],['oblivious',1],['obsess',1],['occlude',3],['oppose',1],['occur',1]]},
+      {name:'FUS-',meaning:'to pour, melt, blend',origin:'Latin fundere, "to pour"',
+       // fus- (fuse, fusion, diffuse), fund- (profound, foundry), foun- (confound, fountain)
+       forms:['fus','fund','foun'],
+       words:[['fuse',1],['fusion',1],['confuse',1],['diffuse',2],['infuse',1],['transfuse',2],['refuse',1],['profuse',2],['effuse',3],['suffuse',3],['confound',2],['profound',2],['foundry',2],['refusal',1],['confusion',1],['diffusion',2],['infusion',2],['transfusion',2],['profusion',2]]},
+    ],
+    prompt:'OB- (against) + FUS- (pour). What experience needs a word?',
+  },
+  {
+    id:2,
+    segments:[{text:'GES',ri:0},{text:'TA',ri:-1},{text:'TION',ri:1}],
+    roots:[
+      {name:'GEST-',meaning:'to carry, bear, do',origin:'Latin gerere / gestare',
+       // gest- is the consistent morpheme across all derivatives
+       forms:['gest'],
+       words:[['gesture',1],['gestate',2],['ingest',1],['digest',1],['suggest',1],['congest',1],['jest',2],['gist',2],['digestion',1],['suggestion',1],['congestion',1],['gesticulate',3],['digestive',1],['congested',1],['suggestive',1],['jester',2]]},
+      {name:'-TION',meaning:'act of, process of, result of',origin:'Latin -tio, suffix of action',
+       // -tion, -sion, and bare -ion are all reflexes of the same Latin suffix
+       forms:['tion$','sion$','ion$'],
+       words:[['nation',1],['station',1],['action',1],['passion',1],['mention',1],['tension',1],['attention',1],['intention',1],['relation',1],['creation',1],['donation',1],['duration',1],['vacation',1],['location',1],['mutation',2],['notation',2],['formation',1],['migration',2],['narration',2],['salvation',2],['taxation',1],['emotion',1],['motion',1],['notion',1],['potion',2]]},
+    ],
+    prompt:'GEST- (carry) + TION (act of). What act of bearing deserves a name?',
+  },
+  {
+    id:3,
+    segments:[{text:'SYN',ri:0},{text:'THE',ri:1},{text:'SIS',ri:2}],
+    roots:[
+      {name:'SYN-',meaning:'together, with, at the same time',origin:'Greek syn, "together"',
+       // syn- assimilates to sym- before b/m/p, syl- before l, sys- before s
+       forms:['^syn','^sym','^syl','^sys'],
+       words:[['sync',1],['synergy',2],['syntax',2],['syndrome',1],['synonym',1],['synchronize',2],['symphony',1],['sympathy',1],['symbol',1],['symbiosis',2],['symmetry',1],['synthetic',1],['synapse',2],['syncopate',3],['symbiotic',2],['symbolic',1]]},
+      {name:'THES-',meaning:'to place, put, set down',origin:'Greek tithenai, "to place"',
+       // thes- (thesis, thesaurus), thet- (synthetic, epithet), them- (theme, anathema)
+       forms:['thes','thet','them'],
+       words:[['thesis',1],['antithesis',2],['hypothesis',1],['parenthesis',2],['prosthesis',2],['epithet',3],['theme',1],['thematic',1],['thesaurus',2],['synthetic',1],['anathema',3],['apothecary',3],['anthology',2]]},
+      {name:'-SIS',meaning:'act of, process, condition',origin:'Greek noun suffix',
+       forms:['sis$'],
+       words:[['analysis',1],['basis',1],['crisis',1],['diagnosis',1],['emphasis',1],['genesis',1],['hypothesis',1],['metamorphosis',2],['paralysis',2],['thesis',1],['ellipsis',2],['axis',1],['osmosis',2],['stasis',2],['catharsis',3],['mimesis',3],['praxis',3],['diegesis',3]]},
+    ],
+    prompt:'SYN (together) + THES (place) + SIS (process). What placing-together needs naming?',
+  },
+  {
+    id:4,
+    segments:[{text:'TELE',ri:0},{text:'SCOPE',ri:1}],
+    roots:[
+      {name:'TELE-',meaning:'far off, at a distance',origin:'Greek tele, "far"',
+       forms:['^tele'],
+       words:[['telephone',1],['telegraph',1],['television',1],['telepathy',1],['telegram',1],['teleport',1],['telecast',1],['telekinesis',2],['telemetry',3],['telephoto',2],['teleconference',1],['telemarketing',1]]},
+      {name:'-SCOPE',meaning:'to look at, examine, observe',origin:'Greek skopein, "to look"',
+       forms:['scope$'],
+       words:[['microscope',1],['horoscope',1],['periscope',2],['kaleidoscope',2],['stethoscope',2],['gyroscope',2],['endoscope',2],['spectroscope',3],['oscilloscope',3],['scope',1]]},
+    ],
+    prompt:'TELE- (far) + SCOPE (look). What distant observation needs naming?',
+  },
+  {
+    id:5,
+    segments:[{text:'LUMEN',ri:0},{text:'ESCENT',ri:1}],
+    roots:[
+      {name:'LUMIN-',meaning:'light, to shine',origin:'Latin lumen "light", lux, lucere',
+       // lumin- (luminous), luc- (lucid, translucent), lux (the word itself), lun- (luna, lunar)
+       forms:['lumin','luc','lux$','^lun'],
+       words:[['luminous',1],['illuminate',1],['luminary',2],['translucent',2],['lucid',2],['elucidate',3],['lux',2],['luna',1],['lunar',1],['lunatic',1],['luster',1],['illustrate',1],['luminosity',2],['bioluminescent',3],['pellucid',3],['lucent',3]]},
+      {name:'-ESCENT',meaning:'becoming, in the process of',origin:'Latin -escere, inceptive suffix',
+       forms:['escent$'],
+       words:[['fluorescent',1],['phosphorescent',2],['adolescent',1],['convalescent',2],['obsolescent',3],['iridescent',2],['opalescent',3],['effervescent',2],['quiescent',3],['evanescent',3],['incandescent',2],['pearlescent',2],['tumescent',3],['senescent',3]]},
+    ],
+    prompt:'LUMIN (light) + ESCENT (becoming). Something in the process of becoming light?',
+  },
+  {
+    id:6,
+    segments:[{text:'AB',ri:0},{text:'STRACT',ri:1}],
+    roots:[
+      {name:'AB-',meaning:'away from, off, apart',origin:'Latin ab/abs, "away from, off"',
+       forms:['^ab','^abs'],
+       words:[['absent',1],['absolute',1],['absorb',1],['absurd',1],['abuse',1],['abrupt',1],['abnormal',1],['abstain',2],['abbreviate',2],['aberrant',2],['abhor',2],['abject',2],['abscond',2],['abstinence',2],['abrogate',3],['abstruse',3],['abstemious',3],['ablative',3],['abolish',1],['abridge',2]]},
+      {name:'TRACT-',meaning:'to drag, draw, pull',origin:'Latin trahere / tractum, "to drag, pull"',
+       forms:['tract','trail','treat','trait'],
+       words:[['attract',1],['contract',1],['distract',1],['extract',1],['retract',1],['subtract',1],['tractor',1],['traction',1],['trace',1],['trait',2],['treat',1],['treaty',2],['portrait',2],['protract',2],['detract',2],['intractable',3],['tractable',2],['contraction',1],['attraction',1],['distraction',1],['extraction',2],['subtraction',1],['retreat',1],['portray',2],['maltreat',2]]},
+    ],
+    prompt:'AB- (away) + TRACT- (pull). Something pulled apart or drawn away that needs a name?',
+  },
+  {
+    id:7,
+    segments:[{text:'IN',ri:0},{text:'FORM',ri:1},{text:'ATION',ri:-1}],
+    roots:[
+      {name:'IN-',meaning:'into, onto, upon',origin:'Latin in, "into, upon"; assimilates to il-, im-, ir-',
+       forms:['^in','^il','^im','^ir'],
+       words:[['include',1],['inject',1],['insert',1],['inspect',1],['install',1],['intend',1],['invest',1],['invite',1],['involve',1],['impose',1],['imprint',1],['impulse',2],['illuminate',1],['illustrate',1],['irrigate',2],['inflict',2],['inflate',1],['infuse',2],['ingress',3],['impel',3],['imbue',3],['immerse',2],['invoke',2],['impart',2]]},
+      {name:'FORM-',meaning:'shape, figure, structure',origin:'Latin forma, "shape, figure, mold"',
+       forms:['form'],
+       words:[['form',1],['format',1],['formal',1],['formula',1],['reform',1],['transform',1],['uniform',1],['conform',1],['perform',1],['deform',2],['inform',1],['platform',1],['formation',1],['formulate',2],['formidable',2],['informal',1],['uniformity',2],['malformed',2],['cuneiform',3],['conformist',2]]},
+    ],
+    prompt:'IN- (into) + FORM- (shape). What gets shaped or poured into a form?',
+  },
+  {
+    id:8,
+    segments:[{text:'CO',ri:0},{text:'HER',ri:1},{text:'ENT',ri:-1}],
+    roots:[
+      {name:'CO-',meaning:'together, jointly, with',origin:'Latin com/con, "with, together"; shortened to co- before vowels and h',
+       forms:['^co','^col','^com','^con','^cor'],
+       words:[['cohere',2],['cohesion',2],['coexist',2],['cooperate',1],['coordinate',1],['coalition',2],['coalesce',2],['coincide',1],['collaborate',1],['collect',1],['colleague',1],['combine',1],['communicate',1],['community',1],['connect',1],['construct',1],['contain',1],['contribute',1],['convince',1],['correspond',1],['correct',1],['correlate',2],['corrupt',2],['cognate',3],['colloquial',3]]},
+      {name:'HAER-',meaning:'to stick, cling, adhere',origin:'Latin haerere, "to stick, cling, be attached"',
+       forms:['adher','coher','inher','hesit','adhes','cohes'],
+       words:[['adhere',2],['adhesive',1],['adhesion',2],['cohere',2],['coherent',1],['coherence',2],['incoherent',1],['inherent',1],['inhere',3],['hesitate',1],['hesitation',1],['hesitant',2],['cohesion',2],['cohesive',2],['inherently',2]]},
+    ],
+    prompt:'CO- (together) + HAER- (stick). What sticks together but has no word yet?',
+  },
+  {
+    id:9,
+    segments:[{text:'ART',ri:0},{text:'I',ri:-1},{text:'FIC',ri:1},{text:'IAL',ri:-1}],
+    roots:[
+      {name:'ART-',meaning:'skill, craft, technique',origin:'Latin ars / artis, "skill, craft, method"',
+       forms:['^art'],
+       words:[['art',1],['artist',1],['artisan',2],['artifact',1],['artistry',2],['artistic',1],['artful',2],['artless',2],['artwork',1],['inert',2],['inertia',2],['artefact',2],['artifice',2]]},
+      {name:'FIC-',meaning:'to make, do, produce',origin:'Latin facere / fic-, "to make, do"',
+       forms:['fic','fact','fect','feas','fy$'],
+       words:[['affect',1],['effect',1],['defect',1],['infect',1],['perfect',1],['fact',1],['factor',1],['factory',1],['manufacture',1],['beneficial',2],['terrific',1],['specific',1],['scientific',1],['prolific',2],['magnificent',2],['pacific',2],['proficient',2],['sufficient',1],['efficient',1],['feasible',2],['feat',2],['feature',1],['satisfy',1],['certify',1],['justify',1],['terrify',1],['clarify',1],['verify',1],['pacify',1]]},
+    ],
+    prompt:'ART- (skill) + FIC- (make). What skillfully made thing still lacks a name?',
+  },
+  {
+    id:10,
+    segments:[{text:'CO',ri:0},{text:'AL',ri:1},{text:'ESCE',ri:-1}],
+    roots:[
+      {name:'CO-',meaning:'together, jointly, with',origin:'Latin com/con, "with, together"; shortened to co- before vowels and h',
+       forms:['^co','^col','^com','^con','^cor'],
+       words:[['cohere',2],['cohesion',2],['coexist',2],['cooperate',1],['coordinate',1],['coalition',2],['coincide',1],['collaborate',1],['collect',1],['colleague',1],['combine',1],['communicate',1],['community',1],['connect',1],['construct',1],['contain',1],['contribute',1],['convince',1],['correspond',1],['correct',1],['correlate',2],['corrupt',2]]},
+      {name:'AL-',meaning:'to nourish, cause to grow',origin:'Latin alere, "to nourish, feed, sustain"',
+       forms:['alesc','aliment','alumn','alma'],
+       words:[['alumni',2],['alumnus',2],['aliment',3],['alimentary',3],['alma',2],['coalesce',2],['coalescent',3],['coalition',2],['adolescent',2],['adult',2]]},
+    ],
+    prompt:'CO- (together) + AL- (nourish/grow). What things nourish each other into becoming one?',
+  },
+];
+
+// ── DAILY (midnight EST/EDT rollover) ────────────────────────────
+const LAUNCH = '2026-03-09'; // Day 1 = Monday March 9
+
+// Returns today's date string (YYYY-MM-DD) in the America/New_York timezone,
+// so the puzzle flips at midnight EST/EDT regardless of the player's location.
+function getESTDateStr() {
+  return new Date().toLocaleDateString('en-CA', {timeZone: 'America/New_York'});
+}
+
+const estDateStr = getESTDateStr();
+const dayIndex = Math.floor((new Date(estDateStr) - new Date(LAUNCH)) / 86400000);
+const puzzleIndex = ((dayIndex % WORDS.length) + WORDS.length) % WORDS.length;
+const today = WORDS[puzzleIndex];
+const puzzleDay = dayIndex + 1; // 1-based day number shown to players
+const SK = `etymon_${estDateStr}`; // one save slot per EST calendar day
+
+// ── STATE ────────────────────────────────────────────────────────
+let foundByRoot = {};   // ri -> [{word, pts}]
+let unmatched = [];
+let selfDiscovered = new Set(); // root indices discovered by player (not via reveal btn)
+let revealedRoots = new Set();  // all lit roots (self + manual reveal)
+let coined = null;
+let voted = false;
+let done = false;
+
+today.roots.forEach((_,i) => { foundByRoot[i] = []; });
+
+function calcScore() {
+  let pts = 0;
+  today.roots.forEach((_,i) => { foundByRoot[i].forEach(e => pts += e.pts); });
+  selfDiscovered.forEach(ri => { pts += 3; });
+  return pts;
+}
+
+function save() {
+  try {
+    localStorage.setItem(SK, JSON.stringify({
+      foundByRoot: Object.fromEntries(Object.entries(foundByRoot).map(([k,v])=>[k,v])),
+      unmatched, selfDiscovered:[...selfDiscovered], revealedRoots:[...revealedRoots],
+      coined, voted, done
+    }));
+  } catch(e){}
+}
+function load() {
+  try {
+    const s = JSON.parse(localStorage.getItem(SK)||'null');
+    if(!s) return;
+    Object.entries(s.foundByRoot||{}).forEach(([k,v])=>{foundByRoot[k]=v;});
+    unmatched = s.unmatched||[];
+    selfDiscovered = new Set(s.selfDiscovered||[]);
+    revealedRoots = new Set(s.revealedRoots||[]);
+    coined = s.coined||null;
+    voted = s.voted||false;
+    done = s.done||false;
+  } catch(e){}
+}
+
+// ── INIT ─────────────────────────────────────────────────────────
+function init() {
+  document.getElementById('puzzle-label').textContent =
+    `№${puzzleDay} · ${new Date(estDateStr+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})}`;
+
+  // Word segments
+  const tw = document.getElementById('target-word');
+  today.segments.forEach((seg,si) => {
+    const span = document.createElement('span');
+    span.textContent = seg.text;
+    span.id = `seg${si}`;
+    span.className = 'word-seg' + (seg.ri<0?' connector':` ${C[seg.ri].cls}`);
+    if(seg.ri>=0) span.dataset.ri = seg.ri;
+    tw.appendChild(span);
+  });
+
+  // Pills
+  const pp = document.getElementById('root-pills');
+  today.roots.forEach((_,i) => {
+    const p = document.createElement('span');
+    p.className = `rpill ${C[i].cls}`;
+    p.id = `pill${i}`;
+    p.textContent = today.roots[i].name;
+    pp.appendChild(p);
+  });
+
+  // Root cards (hidden until lit)
+  const rc = document.getElementById('root-cards');
+  today.roots.forEach((r,i) => {
+    const d = document.createElement('div');
+    d.className = `rcard ${C[i].cls}`;
+    d.id = `rcard${i}`;
+    d.innerHTML = `
+      <div class="rcard-top">
+        <span class="rcard-name ${C[i].cls}">${r.name}</span>
+        <span class="rcard-bonus" id="rcard-bonus${i}"></span>
+      </div>
+      <div class="rcard-meaning">${r.meaning}</div>
+      <div class="rcard-origin">${r.origin}</div>`;
+    rc.appendChild(d);
+  });
+
+  // Hint rows for unrevealed roots
+  const rh = document.getElementById('root-hints');
+  today.roots.forEach((_,i) => {
+    const hint = document.createElement('div');
+    hint.className = 'root-hint';
+    hint.id = `hint${i}`;
+    hint.innerHTML = `<span style="color:${C[i].hex};font-size:.75rem;font-weight:600">?</span><span>unknown root</span><button class="reveal-root-btn" data-ri="${i}">Reveal</button>`;
+    rh.appendChild(hint);
+  });
+
+  // Found columns
+  const fa = document.getElementById('found-area');
+  today.roots.forEach((r,i) => {
+    const col = document.createElement('div');
+    col.className = 'root-col';
+    col.id = `col${i}`;
+    col.innerHTML = `<div class="rcol-header ${C[i].cls}">${r.name}</div><div class="words-flow" id="flow${i}"></div>`;
+    fa.appendChild(col);
+  });
+
+  // Reveal root buttons
+  document.querySelectorAll('.reveal-root-btn').forEach(btn => {
+    btn.addEventListener('click', () => revealRoot(parseInt(btn.dataset.ri), false));
+  });
+
+  document.getElementById('coin-prompt').textContent = "Did today's roots make you think of a word that REALLY needs to exist? Share it here.";
+
+  load();
+  rebuildUI();
+  if(done) showResults();
+}
+
+function rebuildUI() {
+  today.roots.forEach((_,i) => {
+    foundByRoot[i].forEach(e => addTag(i,e.word,e.pts,false));
+    if(revealedRoots.has(i)) {
+      lightRoot(i,false);
+      if(!selfDiscovered.has(i)) showHint(i,false); // hint gone, card shown, no bonus msg yet
+    }
+  });
+  unmatched.forEach(w => addUnmatched(w,false));
+  // Update all bonus labels
+  today.roots.forEach((_,i) => {
+    if(revealedRoots.has(i)) updateBonusLabel(i);
+  });
+  updateStats();
+}
+
+// ── ROOT LIGHTING ─────────────────────────────────────────────────
+function lightRoot(ri, animate=true) {
+  revealedRoots.add(ri);
+  // Segments
+  today.segments.forEach((seg,si) => {
+    if(seg.ri===ri) {
+      const el = document.getElementById(`seg${si}`);
+      el.classList.add('discovered');
+      if(!animate) el.style.animation='none';
+    }
+  });
+  // Pill
+  document.getElementById(`pill${ri}`).classList.add('show');
+  // Column
+  document.getElementById(`col${ri}`).classList.add('show');
+  // Root card
+  document.getElementById(`rcard${ri}`).classList.add('show');
+}
+
+function showHint(ri, visible=true) {
+  const hint = document.getElementById(`hint${ri}`);
+  hint.style.display = visible ? 'flex' : 'none';
+}
+
+function updateBonusLabel(ri) {
+  const el = document.getElementById(`rcard-bonus${ri}`);
+  if(selfDiscovered.has(ri)) {
+    el.className = 'rcard-bonus earned';
+    el.textContent = '+3 pts — found it yourself!';
+  } else {
+    el.className = 'rcard-bonus missed';
+    el.textContent = 'revealed';
+  }
+}
+
+// Player discovers a root via a word guess
+function discoverRoot(ri, animate=true) {
+  if(revealedRoots.has(ri)) return; // already lit
+  selfDiscovered.add(ri);
+  lightRoot(ri, animate);
+  showHint(ri, false);
+  updateBonusLabel(ri);
+}
+
+// Player clicks Reveal button for a specific root
+function revealRoot(ri, animate=true) {
+  if(revealedRoots.has(ri)) return;
+  // Not self-discovered — no bonus
+  lightRoot(ri, animate);
+  showHint(ri, false);
+  updateBonusLabel(ri);
+  save();
+  updateStats();
+}
+
+// ── DICTIONARY CHECK ─────────────────────────────────────────────
+async function isRealWord(word) {
+  try {
+    const res = await fetch(`https://api.datamuse.com/words?sp=${encodeURIComponent(word)}&max=1`);
+    const data = await res.json();
+    return data.length > 0 && data[0].word.toLowerCase() === word.toLowerCase();
+  } catch {
+    return true; // offline fallback — trust the player
+  }
+}
+
+// Returns the root index whose morpheme forms match this word, or null.
+function rootIndexByForms(word) {
+  for(let i=0;i<today.roots.length;i++) {
+    const matched = today.roots[i].forms.some(f => new RegExp(f,'i').test(word));
+    if(matched) return i;
+  }
+  return null;
+}
+
+// ── SUBMISSION ───────────────────────────────────────────────────
+function acceptWord(ri, word, tier) {
+  const wasNewRoot = !revealedRoots.has(ri);
+  foundByRoot[ri].push({word, pts:tier});
+  discoverRoot(ri);
+  addTag(ri, word, tier, true);
+  updateStats();
+  save();
+  if(wasNewRoot) {
+    showFb(`🌟 New root found! +${tier} pt${tier>1?'s':''} +3 root bonus`,'great');
+  } else if(tier===3) {
+    showFb(`✦ Rare find! +3 pts`,'great');
+  } else if(tier===2) {
+    showFb(`✓ Nice! +2 pts`,'good');
+  } else {
+    showFb(`✓ +1 pt`,'good');
+  }
+}
+
+async function submit() {
+  const input = document.getElementById('word-input');
+  const raw = input.value.trim().toLowerCase();
+  input.value = '';
+  if(!raw || raw.length < 2) return;
+
+  // Already found?
+  for(let i=0;i<today.roots.length;i++) {
+    if(foundByRoot[i].find(e=>e.word===raw)) { showFb(`"${raw}" already found!`,'already'); return; }
+  }
+  if(unmatched.includes(raw)) { showFb(`Already tried "${raw}".`,'already'); return; }
+
+  // 1. Check curated list — preserves tiered scoring for known words
+  for(let i=0;i<today.roots.length;i++) {
+    const entry = today.roots[i].words.find(([w])=>w.toLowerCase()===raw);
+    if(entry) { acceptWord(i, raw, entry[1]); return; }
+  }
+
+  // 2. Not in curated list — validate it's a real word first
+  showFb('Checking…','');
+  const real = await isRealWord(raw);
+  if(!real) {
+    showFb(`"${raw}" isn't a real word.`,'bad');
+    return;
+  }
+
+  // 3. Real word — does it match any root's morpheme patterns?
+  const formRI = rootIndexByForms(raw);
+  if(formRI !== null) {
+    acceptWord(formRI, raw, 1); // open-ended finds score as tier 1
+    return;
+  }
+
+  // 4. Real word but no root match — log as unmatched
+  unmatched.push(raw);
+  addUnmatched(raw, true);
+  save();
+  showFb(`"${raw}" is a real word, but doesn't share a root.`,'bad');
+}
+
+function addTag(ri, word, pts, animate) {
+  const flow = document.getElementById(`flow${ri}`);
+  const t = document.createElement('span');
+  t.className = `ftag ${C[ri].cls}`;
+  if(!animate) t.style.animation='none';
+  const ptLabel = pts===3?'✦✦✦':pts===2?'✦✦':'✦';
+  t.innerHTML = `${word}<span class="ftag-pts">${ptLabel}</span>`;
+  flow.appendChild(t);
+}
+
+function addUnmatched(word, animate) {
+  const row = document.getElementById('unmatched-row');
+  const t = document.createElement('span');
+  t.className='utag';
+  if(!animate) t.style.animation='none';
+  t.textContent=word;
+  row.appendChild(t);
+  row.classList.add('show');
+}
+
+function updateStats() {
+  const total = Object.values(foundByRoot).reduce((s,a)=>s+a.length,0);
+  const score = calcScore();
+  document.getElementById('wcount').textContent = total;
+  document.getElementById('rcount').textContent = revealedRoots.size;
+  document.getElementById('score-hdr').textContent = score;
+  const all = revealedRoots.size===today.roots.length;
+  document.getElementById('roots-status').textContent = all?'🌟 all roots lit':`of ${today.roots.length} roots`;
+}
+
+function showFb(msg,type) {
+  const fb=document.getElementById('feedback');
+  fb.textContent=msg; fb.className=`feedback ${type}`;
+  if(type!=='bad') setTimeout(()=>{fb.textContent='';fb.className='feedback';},2000);
+}
+
+document.getElementById('sub-btn').addEventListener('click',()=>submit());
+document.getElementById('word-input').addEventListener('keydown',e=>{if(e.key==='Enter')submit();});
+document.getElementById('done-btn').addEventListener('click',()=>{done=true;save();showResults();});
+
+// ── RESULTS ──────────────────────────────────────────────────────
+function showResults() {
+  document.getElementById('game').style.display='none';
+  document.getElementById('results').classList.add('show');
+
+  const wordText = today.segments.map(s=>s.text).join('');
+  const score = calcScore();
+  const total = Object.values(foundByRoot).reduce((s,a)=>s+a.length,0);
+  const date = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+
+  document.getElementById('res-date').textContent = date;
+  document.getElementById('res-word').textContent = wordText;
+  document.getElementById('res-score-big').textContent = score;
+  document.getElementById('res-summary').innerHTML =
+    `<span>${total}</span> word${total!==1?'s':''} found across <span>${revealedRoots.size}</span> of ${today.roots.length} roots`;
+
+  // Score breakdown
+  const sbRows = document.getElementById('sb-rows');
+  let wordPts = 0;
+  today.roots.forEach((_,i) => { foundByRoot[i].forEach(e=>wordPts+=e.pts); });
+  const bonusPts = selfDiscovered.size * 3;
+
+  today.roots.forEach((r,i) => {
+    const ws = foundByRoot[i];
+    if(ws.length===0) return;
+    const rPts = ws.reduce((s,e)=>s+e.pts,0);
+    const row = document.createElement('div');
+    row.className='sb-row';
+    row.innerHTML=`<span>${r.name} (${ws.length} word${ws.length!==1?'s':''})</span><span class="sb-pts">+${rPts}</span>`;
+    sbRows.appendChild(row);
+  });
+
+  if(bonusPts > 0) {
+    const row = document.createElement('div');
+    row.className='sb-row bonus';
+    row.innerHTML=`<span>🌟 Self-discovered ${selfDiscovered.size} root${selfDiscovered.size!==1?'s':''}</span><span class="sb-pts">+${bonusPts}</span>`;
+    sbRows.appendChild(row);
+  }
+  const totalRow = document.createElement('div');
+  totalRow.className='sb-row total';
+  totalRow.innerHTML=`<span>Total</span><span class="sb-pts">${score}</span>`;
+  sbRows.appendChild(totalRow);
+
+  // Share text
+  const emojis=['🟣','🟠','🟢','🟡','🩷'];
+  let share=`Etymon №${puzzleDay} — ${date}\n${wordText}\n`;
+  today.roots.forEach((r,i)=>{
+    const c=foundByRoot[i].length;
+    const self=selfDiscovered.has(i)?'🌟':'';
+    share+=`${emojis[i%5]}${self} ${r.name} ${c} word${c!==1?'s':''}\n`;
+  });
+  share+=`Score: ${score} pts\nplay at etymon.app`;
+  document.getElementById('share-card').textContent=share;
+
+  // Root breakdown
+  const bd=document.getElementById('res-bd');
+  bd.innerHTML='<h3>Words by root</h3>';
+  today.roots.forEach((r,i)=>{
+    const ws=foundByRoot[i];
+    const b=document.createElement('div');
+    b.className='rb-block';
+    b.innerHTML=`<div class="rb-root" style="color:${C[i].hex}">${r.name}${selfDiscovered.has(i)?' 🌟':''}</div><div class="rb-meaning">${r.meaning}</div><div class="rb-words">${ws.length?ws.map(e=>`<span class="rb-w" style="background:${C[i].pale};color:${C[i].hex}">${e.word}</span>`).join(''):'<span style="font-size:.72rem;color:var(--ink-light);font-style:italic">none found</span>'}</div>`;
+    bd.appendChild(b);
+  });
+
+  // Coin a word
+  document.getElementById('coin-prompt').textContent=today.prompt;
+  if(coined) restoreCoined();
+
+  const now=new Date(),tom=new Date(now);
+  tom.setDate(tom.getDate()+1);tom.setHours(0,0,0,0);
+  document.getElementById('next-note').textContent=`Next Etymon in ~${Math.ceil((tom-now)/3600000)} hours`;
+}
+
+document.getElementById('share-btn').addEventListener('click',()=>{
+  navigator.clipboard.writeText(document.getElementById('share-card').textContent).then(()=>{
+    document.getElementById('share-btn').textContent='Copied!';
+    setTimeout(()=>{document.getElementById('share-btn').textContent='Copy result';},2000);
+  });
+});
+
+// ── COIN A WORD ───────────────────────────────────────────────────
+document.getElementById('coin-btn').addEventListener('click', async ()=>{
+  const name=document.getElementById('iname').value.trim();
+  const def=document.getElementById('idef').value.trim();
+  if(!name||!def) return;
+
+  coined={name,def}; save(); showCoinedCard();
+
+  // Send to Formspree — fire and forget, don't block the UI
+  try {
+    await fetch('https://formspree.io/f/mojkjjwb', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+      body: JSON.stringify({
+        word: name,
+        definition: def,
+        puzzle: `№${puzzleDay} — ${today.segments.map(s=>s.text).join('')}`,
+      }),
+    });
+  } catch(e) { /* submission failure is silent — player already sees their coined card */ }
+});
+
+function showCoinedCard() {
+  if(!coined) return;
+  document.getElementById('iname').value=coined.name;
+  document.getElementById('idef').value=coined.def;
+  document.getElementById('coined-word').textContent=coined.name;
+  document.getElementById('coined-def').textContent=`(n.) ${coined.def}`;
+  document.getElementById('coined-card').classList.add('show');
+}
+
+function restoreCoined() {
+  showCoinedCard();
+  if(voted){
+    document.getElementById('vote-btn').classList.add('voted');
+    document.getElementById('vote-note').textContent='You voted for this.';
+  }
+}
+
+document.getElementById('vote-btn').addEventListener('click',()=>{
+  if(voted) return;
+  voted=true; save();
+  document.getElementById('vote-btn').classList.add('voted');
+  document.getElementById('vote-note').textContent='You voted for this.';
+});
+
+init();
+// Show hints for undiscovered roots on load
+today.roots.forEach((_,i)=>{
+  if(!revealedRoots.has(i)) showHint(i,true);
+  else showHint(i,false);
+});
+updateStats();
+</script>
+</body>
+</html>
