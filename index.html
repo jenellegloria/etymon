@@ -182,9 +182,27 @@
   <div class="header-right">
     <span class="puzzle-label" id="puzzle-label"></span>
     <a href="archive.html" style="font-size:.72rem;color:var(--ink-light);letter-spacing:.08em;text-decoration:none;transition:color .15s;" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--ink-light)'">Archive</a>
+    <button id="help-btn" style="font-size:.72rem;color:var(--ink-light);background:none;border:none;cursor:pointer;padding:0;font-family:'DM Sans',sans-serif;letter-spacing:.08em;transition:color .15s;" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--ink-light)'">?</button>
     <div class="score-display">Score: <span id="score-hdr">0</span></div>
   </div>
 </header>
+
+<!-- HOW TO PLAY MODAL -->
+<div id="help-modal" style="display:none;position:fixed;inset:0;background:rgba(17,16,16,.5);z-index:400;align-items:center;justify-content:center;padding:1.5rem;">
+  <div style="background:#FFFEF9;border-radius:14px;width:100%;max-width:420px;padding:1.8rem 1.8rem 1.5rem;position:relative;">
+    <button id="help-close" style="position:absolute;top:.9rem;right:1rem;background:none;border:none;font-size:1.1rem;color:var(--ink-light);cursor:pointer;">✕</button>
+    <div style="font-size:.65rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-light);margin-bottom:.5rem;">How to play</div>
+    <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:var(--ink);margin-bottom:1.2rem;line-height:1.2;">Every word has roots.<br>Find them.</div>
+    <div style="display:flex;flex-direction:column;gap:.85rem;font-size:.84rem;color:var(--ink-mid);line-height:1.6;">
+      <div><strong style="color:var(--ink);">The target word</strong> is shown broken into colored segments — each color is a root to discover.</div>
+      <div><strong style="color:var(--ink);">Type any word</strong> you think shares a root. If it does, that root lights up and you score points.</div>
+      <div><strong style="color:var(--ink);">Gray segments</strong> are connective tissue — Latin glue that holds the word together. Not scored, just shown for clarity.</div>
+      <div><strong style="color:var(--ink);">Reveal a root</strong> if you're stuck — but finding it yourself first earns a <strong>+3 bonus</strong>. 🌟</div>
+      <div><strong style="color:var(--ink);">Rarer words</strong> score more: ✦ common · ✦✦ good find · ✦✦✦ rare</div>
+    </div>
+    <button id="help-got-it" style="margin-top:1.4rem;width:100%;background:var(--ink);color:white;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.84rem;font-weight:500;padding:.65rem;cursor:pointer;">Got it</button>
+  </div>
+</div>
 
 <main id="game">
   <div class="word-section">
@@ -285,18 +303,16 @@ const WORDS = [
   },
   {
     id:2,
-    segments:[{text:'GEST',ri:0},{text:'A',ri:-1},{text:'TION',ri:1}],
+    segments:[{text:'CORPUS',ri:0},{text:'CLE',ri:1}],
     roots:[
-      {name:'GEST-',meaning:'to carry, bear, do',origin:'Latin gerere / gestare',
-       // gest- is the consistent morpheme across all derivatives
-       forms:['gest'],
-       words:[['gesture',1],['gestate',2],['ingest',1],['digest',1],['suggest',1],['congest',1],['jest',2],['digestion',1],['suggestion',1],['congestion',1],['gesticulate',3],['digestive',1],['congested',1],['suggestive',1],['jester',2]]},
-      {name:'-TION',meaning:'act of, process of, result of',origin:'Latin -tio, suffix of action',
-       // -tion, -sion, and bare -ion are all reflexes of the same Latin suffix
-       forms:['tion$','sion$','ion$'],
-       words:[['nation',1],['station',1],['action',1],['passion',1],['mention',1],['tension',1],['attention',1],['intention',1],['relation',1],['creation',1],['donation',1],['duration',1],['vacation',1],['location',1],['mutation',2],['notation',2],['formation',1],['migration',2],['narration',2],['salvation',2],['taxation',1],['emotion',1],['motion',1],['notion',1]]},
+      {name:'CORPUS-',meaning:'body',origin:'Latin corpus, "body"',
+       forms:['corp','cors'],
+       words:[['corpse',1],['corporal',1],['corporation',1],['incorporate',1],['corps',1],['corporeal',2],['corsage',2],['corpus',1],['corpulent',2],['corpulence',2],['incorporeal',2],['corse',3],['corset',2],['habeas corpus',3]]},
+      {name:'-CLE',meaning:'small, little (diminutive)',origin:'Latin -culus/-cula/-culum',
+       forms:['cle$','cule$','cul'],
+       words:[['molecule',1],['particle',1],['follicle',2],['tentacle',1],['cubicle',1],['article',1],['minuscule',2],['ridicule',2],['reticule',3],['ossicle',3],['ventricle',2],['testicle',2],['versicle',3],['fascicle',3],['auricle',3],['carbuncle',2],['barnacle',2],['pinnacle',2],['spectacle',1],['obstacle',1],['receptacle',2]]},
     ],
-    prompt:'GEST- (carry) + TION (act of). Did these roots make you think of a word that REALLY needs to exist? Share it here.',
+    prompt:'CORPUS (body) + -CLE (little). Coin a word about bodies, smallness, or little things that matter.',
   },
   {
     id:3,
@@ -476,7 +492,7 @@ function updateStreak() {
   if (lastId === today.id - 1) {
     newStreak = streak + 1;       // played yesterday, extend streak
   } else if (lastId === today.id) {
-    return;                        // already counted today, do nothing
+    return streak;                 // already counted today, return existing streak for display
   } else {
     newStreak = 1;                 // gap in play, reset
   }
@@ -954,6 +970,21 @@ today.roots.forEach((_,i)=>{
   else showHint(i,false);
 });
 updateStats();
+
+// ── HELP MODAL ────────────────────────────────────────────────────
+document.getElementById('help-btn').addEventListener('click', () => {
+  document.getElementById('help-modal').style.display = 'flex';
+});
+document.getElementById('help-close').addEventListener('click', () => {
+  document.getElementById('help-modal').style.display = 'none';
+});
+document.getElementById('help-got-it').addEventListener('click', () => {
+  document.getElementById('help-modal').style.display = 'none';
+});
+document.getElementById('help-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('help-modal'))
+    document.getElementById('help-modal').style.display = 'none';
+});
 </script>
 </body>
 </html>
