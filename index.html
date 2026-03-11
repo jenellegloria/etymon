@@ -182,6 +182,7 @@
   <div class="header-right">
     <span class="puzzle-label" id="puzzle-label"></span>
     <a href="archive.html" style="font-size:.72rem;color:var(--ink-light);letter-spacing:.08em;text-decoration:none;transition:color .15s;" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--ink-light)'">Archive</a>
+    <a href="stats.html" style="font-size:.72rem;color:var(--ink-light);letter-spacing:.08em;text-decoration:none;transition:color .15s;" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--ink-light)'">Stats</a>
     <button id="help-btn" style="font-size:.72rem;color:var(--ink-light);background:none;border:none;cursor:pointer;padding:0;font-family:'DM Sans',sans-serif;letter-spacing:.08em;transition:color .15s;" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--ink-light)'">?</button>
     <div class="score-display">Score: <span id="score-hdr">0</span></div>
   </div>
@@ -517,6 +518,7 @@ function calcScore() {
 function save() {
   try {
     localStorage.setItem(SK, JSON.stringify({
+      id: today.id,
       foundByRoot: Object.fromEntries(Object.entries(foundByRoot).map(([k,v])=>[k,v])),
       unmatched, selfDiscovered:[...selfDiscovered], revealedRoots:[...revealedRoots],
       coined, voted, done
@@ -941,7 +943,10 @@ function showResults() {
     const self=selfDiscovered.has(i)?'🌟':'';
     share+=`${emojis[i%5]}${self} ${r.name} ${c} word${c!==1?'s':''}\n`;
   });
-  share+=`Score: ${score} pts\nplay at https://jenellegloria.github.io/etymon`;
+  const streakData = JSON.parse(localStorage.getItem('etymon_streak') || '{}');
+  const streakCount = streakData.streak || 0;
+  const streakLine = streakCount > 1 ? `\n🔥 ${streakCount} day streak` : '';
+  share+=`Score: ${score} pts${streakLine}\nplay at https://jenellegloria.github.io/etymon`;
   document.getElementById('share-card').textContent=share;
 
   // Root breakdown
