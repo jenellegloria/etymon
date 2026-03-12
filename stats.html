@@ -183,6 +183,7 @@ function render() {
       const rootNames = Object.keys(data.foundByRoot || {});
       games.push({
         key,
+	id: data.id,
         dateStr,
         date: new Date(dateStr + 'T12:00:00'),
         score,
@@ -248,7 +249,7 @@ function render() {
 
       return `
         <div class="game-row" style="animation-delay:${idx * 0.04}s">
-          <div class="game-id">${idx + 1 /* placeholder — no puzzle id in save */}</div>
+          <div class="game-id">${g.id || '?'}</div>
           <div class="game-details">
             <div class="game-date">${dateLabel}</div>
             <div class="game-words"><span>${g.wordsFound}</span> words · <span>${g.rootsFound}</span> of ${g.totalRoots} roots${selfLabel}</div>

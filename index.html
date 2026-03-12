@@ -79,6 +79,14 @@
 
   /* STATS */
   .stats-row{display:flex;align-items:center;justify-content:space-between;padding:.55rem 0;border-top:1px solid var(--border);margin-bottom:.7rem;}
+
+  /* Rank progress bar */
+  .rank-bar-wrap{width:100%;margin-bottom:1rem;}
+  .rank-label-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.3rem;}
+  .rank-current{font-size:.78rem;font-weight:600;color:var(--ink);letter-spacing:.02em;}
+  .rank-next{font-size:.68rem;color:var(--ink-light);}
+  .rank-bar-track{position:relative;height:7px;background:var(--bg2);border-radius:99px;overflow:hidden;}
+  .rank-bar-fill{height:100%;border-radius:99px;background:var(--ink);width:0%;transition:width .5s cubic-bezier(.4,0,.2,1);}
   .stat-num{font-family:'Instrument Serif',serif;font-size:1.5rem;line-height:1;color:var(--ink);margin-right:.28rem;}
   .stat-label{font-size:.68rem;color:var(--ink-light);letter-spacing:.04em;}
   .roots-status{font-size:.7rem;color:var(--ink-light);}
@@ -95,6 +103,7 @@
   .feedback.good{color:#16A34A;font-style:normal;font-weight:500;}
   .feedback.great{color:#7C3AED;font-style:normal;font-weight:600;}
   .feedback.bad{color:#DC2626;font-style:normal;}
+  .feedback.note{color:var(--ink-mid);font-style:italic;font-size:.78rem;}
   .feedback.already{color:var(--ink-mid);font-style:normal;}
 
   /* FOUND WORDS */
@@ -199,13 +208,24 @@
       <div><strong style="color:var(--ink);">Type any word</strong> you think shares a root. If it does, that root lights up and you score points.</div>
       <div><strong style="color:var(--ink);">Gray segments</strong> are connective tissue — Latin glue that holds the word together. Not scored, just shown for clarity.</div>
       <div><strong style="color:var(--ink);">Reveal a root</strong> if you're stuck — but finding it yourself first earns a <strong>+3 bonus</strong>. 🌟</div>
-      <div><strong style="color:var(--ink);">Rarer words</strong> score more: ✦ common · ✦✦ good find · ✦✦✦ rare</div>
+      <div><strong style="color:var(--ink);">Rarer words</strong> score more: ✦ open find · ✦✦ good · ✦✦✦ great · ✦✦✦✦ rare · ✦✦✦✦✦ exceptional</div>
+      <div><strong style="color:var(--ink);">Top 20 words per root</strong> count toward your score — so finding rarer words matters more than volume.</div>
     </div>
     <button id="help-got-it" style="margin-top:1.4rem;width:100%;background:var(--ink);color:white;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.84rem;font-weight:500;padding:.65rem;cursor:pointer;">Got it</button>
   </div>
 </div>
 
 <main id="game">
+  <div class="rank-bar-wrap">
+    <div class="rank-label-row">
+      <span class="rank-current" id="rank-current">Etymophobe</span>
+      <span class="rank-next" id="rank-next"></span>
+    </div>
+    <div class="rank-bar-track">
+      <div class="rank-bar-fill" id="rank-bar-fill"></div>
+    </div>
+  </div>
+
   <div class="word-section">
     <div class="target-word" id="target-word"></div>
     <div class="root-pills" id="root-pills"></div>
@@ -240,6 +260,7 @@
   <div class="res-eyebrow" id="res-date"></div>
   <div class="res-word" id="res-word"></div>
   <div class="res-score-big" id="res-score-big"></div>
+  <div id="res-rank" style="display:none;font-family:'Instrument Serif',serif;font-size:1.1rem;color:var(--ink-mid);margin-bottom:.5rem;letter-spacing:.01em;"></div>
   <div class="res-score-label">points</div>
   <div class="res-summary" id="res-summary"></div>
 
@@ -324,12 +345,128 @@ const WORDS = [
      words:[['art',1],['artist',1],['artisan',2],['artistry',2],['artifice',2],['artifact',1],['artefact',2],['artful',2],['artless',2],['artwork',1],['inert',3],['inertia',3]]},
     {name:'-FIC-',meaning:'to make, do (from Latin facere)',origin:'Latin facere, "to make, do" — appears as fac-, fic-, fec-, -fy',
      forms:['fac','fic','fec','fy'],
-     words:[['fact',1],['factor',1],['factory',1],['effect',1],['defect',1],['perfect',1],['infect',1],['affect',1],['manufacture',2],['fiction',1],['efficient',1],['sufficient',1],['beneficial',2],['feasible',2],['feat',3],['feature',1],['justify',2],['clarify',2],['terrify',1],['purify',2],['magnify',2],['glorify',2],['rectify',2],['fortify',2],['satisfy',2],['facsimile',3],['pacific',3],['specific',2],['prolific',2],['facile',2],['facade',2],['sacrifice',2],['office',1]]},
+     words:[['fact',1],['factor',1],['factory',1],['effect',1],['defect',1],['perfect',1],['infect',1],['affect',1],['manufacture',2],['fiction',1],['efficient',1],['sufficient',1],['beneficial',2],['feasible',2],['feat',3],['feature',1],['justify',2],['clarify',2,'from clarus (clear, distinct) + combining form of facere (to make, to do)'],['terrify',1],['purify',2,'great job'],['magnify',2,'-fy sure is a productive suffix'],['glorify',2],['rectify',2],['fortify',2],['satisfy',2],['facsimile',3],['pacific',3],['specific',2,'nice'],['prolific',2],['facile',2,'you are doing so great'],['facade',2,'wowzers'],['sacrifice',2],['office',1,'from the Latin opiFICium - literally, work-doing']]},
   ],
   prompt:'ART- (skill) + -FIC- (to make). Coin a word for something skillfully — or not so skillfully — made.',
 },
 {
   id: 4,
+  segments:[{text:'RE',ri:0},{text:'COM',ri:1},{text:'PENS',ri:2},{text:'E',ri:-1}],
+  roots:[
+    {
+      name:'RE-',
+      meaning:'back, again; against',
+      origin:'Latin re-, inseparable prefix meaning "back, again, anew"',
+      forms:['^re','^red'],
+      words:[
+        ['return',1],['rebuild',1],['reflect',1],['reform',1],['replace',1],
+        ['restore',1],['reverse',1],['repeat',1],['remind',1],['refill',1],
+        ['rewrite',1],['reset',1],['reuse',1],['recall',1],
+        ['reconcile',2],['reconsider',2],['renovate',2],['reciprocal',2],
+        ['redeem',2],['redundant',2],['revoke',2],['recant',2],
+        ['restitution',3],['revert',3],['redress',3],['redact',3],
+        ['rebel',3],['remnant',3],['resilient',3],
+        ['render',4,'from Latin reddere, "give back" — the red- form of re- before vowels, worn smooth by centuries of use'],
+        ['ransom',4,'a doublet of redemption — the re- prefix shrank to r- over centuries of use'],
+        ['redintegrate',4],
+        ['redolent',5,'from Latin redolere, "to emit a smell" — re- here is intensive, meaning "thoroughly smelling"'],
+        ['religion',5,'possibly from Latin religare, "to bind back" — disputed, but the re- has long since dissolved into the word'],
+      ],
+      exclude:[
+        {word:'read', explanation:'"read" is from Old English rǣdan — the re is part of the original word, not the Latin prefix'},
+        {word:'reading', explanation:'"read" is from Old English rǣdan — the re is part of the original word, not the Latin prefix'},
+        {word:'reader', explanation:'"read" is from Old English rǣdan — the re is part of the original word, not the Latin prefix'},
+        {word:'reed', explanation:'"reed" is from Old English hrēod — unrelated to Latin re-'},
+        {word:'real', explanation:'"real" is from Latin res (thing) — the re is not a prefix here'},
+        {word:'really', explanation:'"real" is from Latin res (thing) — the re is not a prefix here'},
+        {word:'reality', explanation:'"real" is from Latin res (thing) — the re is not a prefix here'},
+        {word:'rear', explanation:'"rear" is from Old English rǣran — unrelated to Latin re-'},
+        {word:'reach', explanation:'"reach" is from Old English rǣcan — unrelated to Latin re-'},
+        {word:'realm', explanation:'"realm" is from Old French reaume — the re is not the Latin prefix'},
+        {word:'reel', explanation:'"reel" is from Old English — unrelated to Latin re-'},
+        {word:'reek', explanation:'"reek" is from Old English rēocan — unrelated to Latin re-'},
+        {word:'reign', explanation:'"reign" is from Latin regnum (kingdom) — the re is not a prefix'},
+        {word:'rein', explanation:'"rein" is from Old French rene — unrelated to Latin re-'},
+        {word:'reins', explanation:'"reins" is from Old French rene — unrelated to Latin re-'},
+        {word:'rent', explanation:'"rent" is from Old French rente — the re is not the Latin prefix'},
+        {word:'rest', explanation:'"rest" is from Old English — unrelated to Latin re-'},
+        {word:'rev', explanation:'"rev" is informal for revolution — the re here is not the Latin prefix'},
+      ],
+    },
+    {
+      name:'COM-',
+      meaning:'together, with',
+      origin:'Latin com-, assimilates to con-, col-, cor-, co- depending on following letter',
+      forms:['^com','^con','^col','^cor','^co'],
+      words:[
+        ['combine',1],['connect',1],['collect',1],['community',1],['cooperate',1],
+        ['coexist',1],['compete',1],['complete',1],['compare',1],['compose',1],
+        ['collaborate',2],['correspond',2],['colleague',2],['compile',2],
+        ['convene',2],['converge',2],['console',2],['conspire',2],['concord',2],
+        ['confluence',3],['congruent',3],['consonant',3],['collateral',3],
+        ['commensurate',3],['coalesce',3],['concatenate',3],
+        ['compendium',4],['comity',4],['concomitant',4],
+        ['consanguine',5,'from Latin con- + sanguis (blood) — "of the same blood," the COM- prefix meaning togetherness at its most literal'],
+      ],
+      exclude:[
+        {word:'comedy', explanation:'"comedy" is from Greek kōmōidia — unrelated to Latin com-'},
+        {word:'comet', explanation:'"comet" is from Greek komētēs — unrelated to Latin com-'},
+        {word:'coral', explanation:'"coral" is from Greek korallion — the cor here is not the Latin prefix'},
+        {word:'corner', explanation:'"corner" is from Latin cornu (horn) — the cor is not the prefix com-'},
+        {word:'corn', explanation:'"corn" is from Old English — unrelated to Latin com-'},
+        {word:'copy', explanation:'"copy" is from Latin copia (abundance) — the co is not the prefix com-'},
+        {word:'cord', explanation:'"cord" is from Old French corde — unrelated to Latin com-'},
+        {word:'coat', explanation:'"coat" is from Old French cote — unrelated to Latin com-'},
+        {word:'coast', explanation:'"coast" is from Old French coste — unrelated to Latin com-'},
+        {word:'cobra', explanation:'"cobra" is from Portuguese, from Latin colubra (snake) — the col is not the prefix com-'},
+      ],
+    },
+    {
+      name:'PENS-',
+      meaning:'to hang, weigh, pay',
+      origin:'Latin pendere "to hang," pensare "to weigh, consider" — from PIE *(s)pen- "to draw, stretch, spin"',
+      // note: 'ponder' catches both ponder and ponderous; avoid bare 'pond' which catches respond, correspond
+      forms:['pens','pend','pois','ponder','peso','spin','span'],
+      words:[
+        ['depend',1],['suspend',1],['spend',1],['pension',1],['expensive',1],
+        ['expense',1],['pending',1],
+        ['pensive',2],['pendant',2],['pendulum',2],['suspense',2],['compensate',2],
+        ['dispense',2],['append',2],['appendix',2],['impend',2],
+        ['propensity',3],['stipend',3],['perpendicular',3],['poise',3],
+        ['ponder',3],['compendium',3],
+        ['span',3,'from Old English spannan, from the same PIE root — to span something is to measure its weight and extent'],
+        ['ponderous',4],
+        ['peso',4,'the currency — from Latin pensum, "something weighed out," the same root as pension and pensive'],
+        ['spinster',4,'originally a woman who spins thread — from the PIE root meaning to draw and stretch fiber'],
+        ['preponderant',4],['counterpoise',4],
+        ['pound',4,'the unit of weight — from Latin pondo, "by weight," sharing the same root as pendulum and pension'],
+        ['pansy',5,'from French pensée, "thought" — the flower was named for its contemplative, pensive face'],
+        ['spider',5,'from Old English spiðra, literally "the spinner" — same PIE root as spin, spindle, and spinster'],
+        ['penthouse',5,'not from "pent up" — from Old French apentis, something hanging or leaning against a wall'],
+        ['equipoise',5],
+        ['avoirdupois',5,'from Old French aveir de peis, "goods of weight" — peis is Latin pensum, the same root as pension and pensive, hiding in plain sight'],
+      ],
+      exclude:[
+        {word:'pen', explanation:'"pen" is from Latin penna (feather) — unrelated to pendere'},
+        {word:'pens', explanation:'"pen" is from Latin penna (feather) — unrelated to pendere'},
+        {word:'pencil', explanation:'"pencil" is from Latin penicillus (little brush) — unrelated to pendere'},
+        {word:'penalty', explanation:'"penalty" is from Latin poena (punishment) — unrelated to pendere'},
+        {word:'penal', explanation:'"penal" is from Latin poena (punishment) — unrelated to pendere'},
+        {word:'poison', explanation:'"poison" looks like poise but comes from Latin potionem (a drink) — a false friend'},
+        {word:'poisonous', explanation:'"poison" looks like poise but comes from Latin potionem (a drink) — a false friend'},
+        {word:'pond', explanation:'"pond" (body of water) is from Old English — unrelated to Latin pendere'},
+        {word:'ponds', explanation:'"pond" (body of water) is from Old English — unrelated to Latin pendere'},
+        {word:'respond', explanation:'"respond" is from Latin respondere (to answer) — the -spond is from spondere (to pledge), not pendere'},
+        {word:'correspond', explanation:'"correspond" contains cor- + respondere (to answer) — the -spond is from spondere (to pledge), not pendere'},
+        {word:'despondent', explanation:'"despondent" is from Latin despondere (to give up) — from spondere (to pledge), not pendere'},
+      ],
+    },
+  ],
+  prompt:'RE- (back) + COM- (together) + PENS- (weigh). To recompense is to weigh out payment again. Coin a word about debts, balances, or the things we owe each other.',
+},
+
+{
+  id: 5,
   segments: [{text:'PER',ri:0},{text:'SPEC',ri:1},{text:'TIVE',ri:-1}],
   roots: [
     {name:'PER-',meaning:'through, thoroughly, completely',origin:'Latin per, "through, by means of"',
@@ -369,20 +506,7 @@ const WORDS = [
   prompt:'PER- (through) + SPEC- (to look). To see clearly, you have to look all the way through.',
 },
   
-  {
-    id:5,
-    segments:[{text:'LUMEN',ri:0},{text:'ESCENT',ri:1}],
-    roots:[
-      {name:'LUMIN-',meaning:'light, to shine',origin:'Latin lumen "light", lux, lucere',
-       // lumin- (luminous), luc- (lucid, translucent), lux (the word itself), lun- (luna, lunar)
-       forms:['lumin','luc','lux$','^lun'],
-       words:[['luminous',1],['illuminate',1],['luminary',2],['translucent',2],['lucid',2],['elucidate',3],['lux',2],['luna',1],['lunar',1],['lunatic',1],['luster',1],['illustrate',1],['luminosity',2],['bioluminescent',3],['pellucid',3],['lucent',3]]},
-      {name:'-ESCENT',meaning:'becoming, in the process of',origin:'Latin -escere, inceptive suffix',
-       forms:['escent$'],
-       words:[['fluorescent',1],['phosphorescent',2],['adolescent',1],['convalescent',2],['obsolescent',3],['iridescent',2],['opalescent',3],['effervescent',2],['quiescent',3],['evanescent',3],['incandescent',2],['pearlescent',2],['tumescent',3],['senescent',3]]},
-    ],
-    prompt:'LUMIN (light) + ESCENT (becoming). Did these roots make you think of a word that REALLY needs to exist? Share it here.',
-  },
+  
   {
     id:6,
     segments:[{text:'AB',ri:0},{text:'STRACT',ri:1}],
@@ -479,6 +603,20 @@ const WORDS = [
     ],
     prompt:'TELE- (far) + SCOPE (look). Did these roots make you think of a word that REALLY needs to exist? Share it here.',
   },
+{
+    id:13,
+    segments:[{text:'LUMEN',ri:0},{text:'ESCENT',ri:1}],
+    roots:[
+      {name:'LUMIN-',meaning:'light, to shine',origin:'Latin lumen "light", lux, lucere',
+       // lumin- (luminous), luc- (lucid, translucent), lux (the word itself), lun- (luna, lunar)
+       forms:['lumin','luc','lux$','^lun'],
+       words:[['luminous',1],['illuminate',1],['luminary',2],['translucent',2],['lucid',2],['elucidate',3],['lux',2],['luna',1],['lunar',1],['lunatic',1],['luster',1],['illustrate',1],['luminosity',2],['bioluminescent',3],['pellucid',3],['lucent',3]]},
+      {name:'-ESCENT',meaning:'becoming, in the process of',origin:'Latin -escere, inceptive suffix',
+       forms:['escent$'],
+       words:[['fluorescent',1],['phosphorescent',2],['adolescent',1],['convalescent',2],['obsolescent',3],['iridescent',2],['opalescent',3],['effervescent',2],['quiescent',3],['evanescent',3],['incandescent',2],['pearlescent',2],['tumescent',3],['senescent',3]]},
+    ],
+    prompt:'LUMIN (light) + ESCENT (becoming). Did these roots make you think of a word that REALLY needs to exist? Share it here.',
+  },
 ];
 
 // ── DAILY (midnight EST/EDT rollover) ────────────────────────────
@@ -510,7 +648,11 @@ today.roots.forEach((_,i) => { foundByRoot[i] = []; });
 
 function calcScore() {
   let pts = 0;
-  today.roots.forEach((_,i) => { foundByRoot[i].forEach(e => pts += e.pts); });
+  today.roots.forEach((_,i) => {
+    // Top 20 per root by points descending
+    const sorted = [...foundByRoot[i]].sort((a,b) => b.pts - a.pts).slice(0,20);
+    sorted.forEach(e => pts += e.pts);
+  });
   selfDiscovered.forEach(ri => { pts += 3; });
   return pts;
 }
@@ -768,12 +910,21 @@ function acceptWord(ri, word, tier) {
   save();
   if(wasNewRoot) {
     showFb(`🌟 New root found! +${tier} pt${tier>1?'s':''} +3 root bonus`,'great');
+  } else if(tier===5) {
+    showFb(`✦✦✦✦✦ Exceptional find! +5 pts`,'great');
+  } else if(tier===4) {
+    showFb(`✦✦✦✦ Rare find! +4 pts`,'great');
   } else if(tier===3) {
-    showFb(`✦ Rare find! +3 pts`,'great');
+    showFb(`✦✦✦ Nice find! +3 pts`,'great');
   } else if(tier===2) {
-    showFb(`✓ Nice! +2 pts`,'good');
+    showFb(`✦✦ +2 pts`,'good');
   } else {
-    showFb(`✓ +1 pt`,'good');
+    showFb(`✦ +1 pt`,'good');
+  }
+  // Show note if curated word has one
+  const entry = today.roots[ri]?.words?.find(([w])=>w.toLowerCase()===word.toLowerCase());
+  if(entry && entry[2]) {
+    setTimeout(()=>showFb(entry[2],'note'),400);
   }
 }
 
@@ -793,7 +944,19 @@ async function submit() {
   }
   if(unmatched.includes(raw)) { showFb(`Already tried "${raw}".`,'already'); return; }
 
-  // 1. Check curated list — preserves tiered scoring for known words
+  // 1. Check exclusion lists — false cognates that share a string but not a root
+  for(let i=0;i<today.roots.length;i++) {
+    const excl = (today.roots[i].exclude||[]).find(e=>e.word.toLowerCase()===raw);
+    if(excl) {
+      const msg = excl.explanation
+        ? `✗ "${raw}" — ${excl.explanation}`
+        : `✗ "${raw}" shares the spelling but not the root.`;
+      showFb(msg,'bad');
+      return;
+    }
+  }
+
+  // 2. Check curated list — preserves tiered scoring for known words
   for(let i=0;i<today.roots.length;i++) {
     const entry = today.roots[i].words.find(([w])=>w.toLowerCase()===raw);
     if(entry) { acceptWord(i, raw, entry[1]); return; }
@@ -826,7 +989,7 @@ function addTag(ri, word, pts, animate) {
   const t = document.createElement('span');
   t.className = `ftag ${C[ri].cls}`;
   if(!animate) t.style.animation='none';
-  const ptLabel = pts===3?'✦✦✦':pts===2?'✦✦':'✦';
+  const ptLabel = pts===5?'✦✦✦✦✦':pts===4?'✦✦✦✦':pts===3?'✦✦✦':pts===2?'✦✦':'✦';
   t.innerHTML = `${word}<span class="ftag-pts">${ptLabel}</span>`;
   flow.appendChild(t);
 }
@@ -849,12 +1012,42 @@ function updateStats() {
   document.getElementById('score-hdr').textContent = score;
   const all = revealedRoots.size===today.roots.length;
   document.getElementById('roots-status').textContent = all?'🌟 all roots lit':`of ${today.roots.length} roots`;
+  updateRankBar(score);
 }
 
+function updateRankBar(score) {
+  const RANKS = [
+    { label: 'Etymophiliac', min: 0.75 },
+    { label: 'Word Freak',   min: 0.64 },
+    { label: 'Philologist',  min: 0.50 },
+    { label: 'Wordy',        min: 0.34 },
+    { label: 'Root Hoarder', min: 0.18 },
+    { label: 'Word Curious', min: 0.07 },
+    { label: 'Etymophobe',   min: 0 },
+  ];
+  const max = today.roots.reduce((t,r) => t + r.words.reduce((s,w) => s + w[1], 0), 0);
+  const pct = max > 0 ? Math.min(score / max, 1) : 0;
+  const rank = RANKS.find(r => pct >= r.min) || RANKS[RANKS.length-1];
+  const rankIdx = RANKS.indexOf(rank);
+  const next = RANKS[rankIdx - 1];
+
+  document.getElementById('rank-bar-fill').style.width = (pct * 100) + '%';
+  document.getElementById('rank-current').textContent = rank.label;
+
+  if(next) {
+    const ptsNeeded = Math.ceil(next.min * max) - score;
+    document.getElementById('rank-next').textContent = `${ptsNeeded > 0 ? ptsNeeded : 1} pt${ptsNeeded !== 1 ? 's' : ''} to ${next.label}`;
+  } else {
+    document.getElementById('rank-next').textContent = '🏆 top rank!';
+  }
+}
+
+let _fbTimer = null;
 function showFb(msg,type) {
   const fb=document.getElementById('feedback');
+  if(_fbTimer) { clearTimeout(_fbTimer); _fbTimer=null; }
   fb.textContent=msg; fb.className=`feedback ${type}`;
-  if(type!=='bad') setTimeout(()=>{fb.textContent='';fb.className='feedback';},2000);
+  if(type!=='bad' && type!=='note') _fbTimer=setTimeout(()=>{fb.textContent='';fb.className='feedback';},2000);
 }
 
 document.getElementById('sub-btn').addEventListener('click',()=>submit());
@@ -946,7 +1139,16 @@ function showResults() {
   const streakData = JSON.parse(localStorage.getItem('etymon_streak') || '{}');
   const streakCount = streakData.streak || 0;
   const streakLine = streakCount > 1 ? `\n🔥 ${streakCount} day streak` : '';
-  share+=`Score: ${score} pts${streakLine}\nplay at https://jenellegloria.github.io/etymon`;
+  const maxScoreShare = today.roots.reduce((t,r)=>t+r.words.reduce((s,w)=>s+w[1],0),0);
+  const pctShare = maxScoreShare > 0 ? score / maxScoreShare : 0;
+  const ranksShare = [
+    {label:'Etymophiliac',min:0.75},{label:'Word Freak',min:0.64},
+    {label:'Philologist',min:0.50},{label:'Wordy',min:0.34},
+    {label:'Root Hoarder',min:0.18},{label:'Word Curious',min:0.07},
+    {label:'Etymophobe',min:0},
+  ];
+  const rankShare = ranksShare.find(r=>pctShare>=r.min)||ranksShare[ranksShare.length-1];
+  share+=`Score: ${score} pts · ${rankShare.label}${streakLine}\nplay at https://jenellegloria.github.io/etymon`;
   document.getElementById('share-card').textContent=share;
 
   // Root breakdown
@@ -963,6 +1165,27 @@ function showResults() {
   // Coin a word
   document.getElementById('coin-prompt').textContent=today.prompt;
   if(coined) restoreCoined();
+
+  // Ranking
+  const maxScore = today.roots.reduce((total, r) => {
+    return total + r.words.reduce((s, w) => s + w[1], 0);
+  }, 0);
+  const pct = maxScore > 0 ? score / maxScore : 0;
+  const ranks = [
+    { label: 'Etymophiliac', min: 0.75 },
+    { label: 'Word Freak',   min: 0.64 },
+    { label: 'Philologist',  min: 0.50 },
+    { label: 'Wordy',        min: 0.34 },
+    { label: 'Root Hoarder', min: 0.18 },
+    { label: 'Word Curious', min: 0.07 },
+    { label: 'Etymophobe',   min: 0 },
+  ];
+  const rank = ranks.find(r => pct >= r.min) || ranks[ranks.length-1];
+  const rankEl = document.getElementById('res-rank');
+  if(rankEl) {
+    rankEl.textContent = rank.label;
+    rankEl.style.display = 'block';
+  }
 
   const now=new Date(),tom=new Date(now);
   tom.setDate(tom.getDate()+1);tom.setHours(0,0,0,0);
