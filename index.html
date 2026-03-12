@@ -1026,7 +1026,7 @@ function updateRankBar(score) {
     { label: 'Etymophobe',   min: 0 },
   ];
   const max = today.roots.reduce((t,r) => t + r.words.reduce((s,w) => s + w[1], 0), 0);
-  const pct = max > 0 ? Math.min(score / max, 1) : 0;
+  const pct = max > 0 ? Math.min(score / max * 0.75, 1) : 0;
   const rank = RANKS.find(r => pct >= r.min) || RANKS[RANKS.length-1];
   const rankIdx = RANKS.indexOf(rank);
   const next = RANKS[rankIdx - 1];
