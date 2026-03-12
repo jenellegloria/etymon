@@ -157,8 +157,10 @@
   .coin-fields{display:flex;gap:.4rem;flex-wrap:wrap;}
   .iname{font-family:'Instrument Serif',serif;font-size:1rem;font-style:italic;flex:1;min-width:90px;background:var(--bg);border:1.5px solid var(--border);border-radius:6px;color:var(--ink);padding:.5rem .7rem;outline:none;}
   .idef{font-family:'DM Sans',sans-serif;font-size:.84rem;flex:2;min-width:130px;background:var(--bg);border:1.5px solid var(--border);border-radius:6px;color:var(--ink);padding:.5rem .7rem;outline:none;}
-  .iname:focus,.idef:focus{border-color:var(--ink-mid);}
-  .iname::placeholder,.idef::placeholder{color:var(--ink-light);font-style:italic;}
+
+  .iauthor{font-family:'DM Sans',sans-serif;font-size:.84rem;flex:1;min-width:100px;background:var(--bg);border:1.5px solid var(--border);border-radius:6px;color:var(--ink);padding:.5rem .7rem;outline:none;}
+  .iname:focus,.idef:focus,.iauthor:focus{border-color:var(--ink-mid);}
+  .iname::placeholder,.idef::placeholder,.iauthor::placeholder{color:var(--ink-light);font-style:italic;}
   .coin-btn{font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:500;padding:.5rem .9rem;border-radius:6px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer;transition:all .15s;white-space:nowrap;}
   .coin-btn:hover{background:var(--ink);color:white;}
   .coined-card{display:none;margin-top:.8rem;padding:.8rem;background:var(--bg);border-radius:7px;border:1px solid var(--border);}
@@ -281,6 +283,7 @@
     <div class="coin-fields">
       <input type="text" class="iname" id="iname" placeholder="your word…" autocorrect="off" spellcheck="false"/>
       <input type="text" class="idef" id="idef" placeholder="what it means…"/>
+      <input type="text" class="iauthor" id="iauthor" placeholder="your name (optional)"/>
       <button class="coin-btn" id="coin-btn">Coin it</button>
     </div>
     <div class="coined-card" id="coined-card">
@@ -374,6 +377,7 @@ const WORDS = [
       ],
       exclude:[
         {word:'read', explanation:'"read" is from Old English rǣdan — the re is part of the original word, not the Latin prefix'},
+        {word:'recompense', explanation:'that is the word itself!'},
         {word:'reading', explanation:'"read" is from Old English rǣdan — the re is part of the original word, not the Latin prefix'},
         {word:'reader', explanation:'"read" is from Old English rǣdan — the re is part of the original word, not the Latin prefix'},
         {word:'reed', explanation:'"reed" is from Old English hrēod — unrelated to Latin re-'},
@@ -390,7 +394,6 @@ const WORDS = [
         {word:'reins', explanation:'"reins" is from Old French rene — unrelated to Latin re-'},
         {word:'rent', explanation:'"rent" is from Old French rente — the re is not the Latin prefix'},
         {word:'rest', explanation:'"rest" is from Old English — unrelated to Latin re-'},
-        {word:'rev', explanation:'"rev" is informal for revolution — the re here is not the Latin prefix'},
       ],
     },
     {
@@ -401,7 +404,7 @@ const WORDS = [
       words:[
         ['combine',1],['connect',1],['collect',1],['community',1],['cooperate',1],
         ['coexist',1],['compete',1],['complete',1],['compare',1],['compose',1],
-        ['collaborate',2],['correspond',2],['colleague',2],['compile',2],
+        ['collaborate',2],['correspond',2,'"correspond" contains cor- + respondere (to answer) — the -spond is from spondere (to pledge), not pendere. but the cor- is from the same Latin root as com- so it counts.'],['colleague',2],['compile',2],
         ['convene',2],['converge',2],['console',2],['conspire',2],['concord',2],
         ['confluence',3],['congruent',3],['consonant',3],['collateral',3],
         ['commensurate',3],['coalesce',3],['concatenate',3],
@@ -944,22 +947,25 @@ async function submit() {
   }
   if(unmatched.includes(raw)) { showFb(`Already tried "${raw}".`,'already'); return; }
 
-  // 1. Check exclusion lists — false cognates that share a string but not a root
+  // 1. Check curated list — preserves tiered scoring for known words
+  for(let i=0;i<today.roots.length;i++) {
+    const entry = today.roots[i].words.find(([w])=>w.toLowerCase()===raw);
+    if(entry) { acceptWord(i, raw, entry[1]); return; }
+  }
+
+  // 2. Check exclusion lists — false cognates that share a string but not a root
   for(let i=0;i<today.roots.length;i++) {
     const excl = (today.roots[i].exclude||[]).find(e=>e.word.toLowerCase()===raw);
     if(excl) {
       const msg = excl.explanation
         ? `✗ "${raw}" — ${excl.explanation}`
         : `✗ "${raw}" shares the spelling but not the root.`;
+      unmatched.push(raw);
+      addUnmatched(raw, true);
+      save();
       showFb(msg,'bad');
       return;
     }
-  }
-
-  // 2. Check curated list — preserves tiered scoring for known words
-  for(let i=0;i<today.roots.length;i++) {
-    const entry = today.roots[i].words.find(([w])=>w.toLowerCase()===raw);
-    if(entry) { acceptWord(i, raw, entry[1]); return; }
   }
 
   // 2. Not in curated list — validate it's a real word first
@@ -1026,12 +1032,19 @@ function updateRankBar(score) {
     { label: 'Etymophobe',   min: 0 },
   ];
   const max = today.roots.reduce((t,r) => t + r.words.reduce((s,w) => s + w[1], 0), 0);
-  const pct = max > 0 ? Math.min(score / max * 0.75, 1) : 0;
-  const rank = RANKS.find(r => pct >= r.min) || RANKS[RANKS.length-1];
+  const overallPct = max > 0 ? score / max : 0;
+  const rank = RANKS.find(r => overallPct >= r.min) || RANKS[RANKS.length-1];
   const rankIdx = RANKS.indexOf(rank);
   const next = RANKS[rankIdx - 1];
 
-  document.getElementById('rank-bar-fill').style.width = (pct * 100) + '%';
+  // Fill bar within current rank's band (resets each level)
+  const bandMin = rank.min;
+  const bandMax = next ? next.min : rank.min + (rank.min - (RANKS[rankIdx + 1]?.min || 0));
+  const bandPct = bandMax > bandMin
+    ? Math.min((overallPct - bandMin) / (bandMax - bandMin), 1)
+    : 1;
+
+  document.getElementById('rank-bar-fill').style.width = (bandPct * 100) + '%';
   document.getElementById('rank-current').textContent = rank.label;
 
   if(next) {
@@ -1203,9 +1216,10 @@ document.getElementById('share-btn').addEventListener('click',()=>{
 document.getElementById('coin-btn').addEventListener('click', async ()=>{
   const name=document.getElementById('iname').value.trim();
   const def=document.getElementById('idef').value.trim();
+  const author=document.getElementById('iauthor').value.trim();
   if(!name||!def) return;
 
-  coined={name,def}; save(); showCoinedCard();
+  coined={name,def,author}; save(); showCoinedCard();
 
   // Send to Formspree — fire and forget, don't block the UI
   try {
@@ -1215,6 +1229,7 @@ document.getElementById('coin-btn').addEventListener('click', async ()=>{
       body: JSON.stringify({
         word: name,
         definition: def,
+        author: author||'anonymous',
         puzzle: `№${puzzleDay} — ${today.segments.map(s=>s.text).join('')}`,
       }),
     });
@@ -1225,6 +1240,7 @@ function showCoinedCard() {
   if(!coined) return;
   document.getElementById('iname').value=coined.name;
   document.getElementById('idef').value=coined.def;
+  document.getElementById('iauthor').value=coined.author||'';
   document.getElementById('coined-word').textContent=coined.name;
   document.getElementById('coined-def').textContent=`(n.) ${coined.def}`;
   document.getElementById('coined-card').classList.add('show');
