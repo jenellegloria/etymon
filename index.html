@@ -103,8 +103,8 @@
   .feedback.good{color:#16A34A;font-style:normal;font-weight:500;}
   .feedback.great{color:#7C3AED;font-style:normal;font-weight:600;}
   .feedback.bad{color:#DC2626;font-style:normal;}
-  .feedback.note{color:var(--ink-mid);font-style:italic;font-size:.78rem;}
   .feedback.already{color:var(--ink-mid);font-style:normal;}
+  .feedback-note{font-size:.74rem;min-height:1rem;margin-bottom:.4rem;text-align:center;color:var(--ink-mid);font-style:italic;line-height:1.4;transition:opacity .2s;}
 
   /* FOUND WORDS */
   .found-area{display:flex;flex-direction:column;gap:.55rem;margin-bottom:.6rem;}
@@ -113,10 +113,22 @@
   .rcol-header{font-size:.67rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.3rem;}
   .rcol-header.r0{color:var(--r0)}.rcol-header.r1{color:var(--r1)}.rcol-header.r2{color:var(--r2)}.rcol-header.r3{color:var(--r3)}.rcol-header.r4{color:var(--r4)}
   .words-flow{display:flex;flex-wrap:wrap;gap:.3rem;}
-  .ftag{font-size:.78rem;font-weight:500;padding:.2rem .6rem;border-radius:5px;animation:tagIn .22s ease;display:flex;align-items:center;gap:.3rem;}
+  .ftag{font-size:.78rem;font-weight:500;padding:.2rem .6rem;border-radius:5px;animation:tagIn .22s ease;display:flex;align-items:center;gap:.3rem;cursor:default;}
+  .ftag.has-note{cursor:pointer;}
+  .ftag.has-note:hover{filter:brightness(.93);}
   @keyframes tagIn{from{transform:translateX(-6px);opacity:0}to{transform:translateX(0);opacity:1}}
   .ftag.r0{background:var(--r0p);color:var(--r0)}.ftag.r1{background:var(--r1p);color:var(--r1)}.ftag.r2{background:var(--r2p);color:var(--r2)}.ftag.r3{background:var(--r3p);color:var(--r3)}.ftag.r4{background:var(--r4p);color:var(--r4)}
   .ftag-pts{font-size:.6rem;opacity:.65;font-weight:400;}
+
+  /* WORD TIP MODAL */
+  #word-tip{display:none;position:fixed;inset:0;z-index:200;align-items:center;justify-content:center;padding:1.5rem;}
+  #word-tip.show{display:flex;}
+  .wt-backdrop{position:absolute;inset:0;background:rgba(17,16,16,.35);}
+  .wt-box{position:relative;background:#FFFEF9;border-radius:12px;padding:1.1rem 1.3rem;max-width:340px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,.13);}
+  .wt-word{font-family:'Instrument Serif',serif;font-size:1.15rem;font-style:italic;margin-bottom:.35rem;}
+  .wt-note{font-size:.83rem;color:var(--ink-mid);line-height:1.55;}
+  .wt-close{position:absolute;top:.7rem;right:.9rem;background:none;border:none;font-size:1rem;color:var(--ink-light);cursor:pointer;line-height:1;}
+  .wt-close:hover{color:var(--ink);}
 
   .unmatched-row{display:none;flex-wrap:wrap;gap:.28rem;padding:.45rem 0;border-top:1px dashed var(--border);margin-bottom:.4rem;}
   .unmatched-row.show{display:flex;}
@@ -184,6 +196,15 @@
   .next-note{margin-top:1.5rem;font-size:.75rem;color:var(--ink-light);font-style:italic;}
 
   @media(max-width:480px){.target-word{font-size:2.1rem;}main{padding:0 1rem;}#results{padding:2rem 1rem 2rem;}.coin-fields{flex-direction:column;}.iname,.idef{min-width:0;}}
+
+  /* MILESTONE TOAST */
+  #milestone-toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(120%);background:var(--ink);color:white;border-radius:12px;padding:1rem 1.3rem;max-width:320px;width:calc(100% - 3rem);z-index:300;box-shadow:0 4px 24px rgba(0,0,0,.18);transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .35s;opacity:0;pointer-events:none;}
+  #milestone-toast.show{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto;}
+  .mt-title{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.6;margin-bottom:.3rem;}
+  .mt-body{font-size:.84rem;line-height:1.5;}
+  .mt-hint{font-size:.75rem;opacity:.7;margin-top:.4rem;font-style:italic;}
+  .mt-close{position:absolute;top:.6rem;right:.8rem;background:none;border:none;color:white;opacity:.5;font-size:1rem;cursor:pointer;line-height:1;}
+  .mt-close:hover{opacity:1;}
 </style>
 </head>
 <body>
@@ -250,6 +271,7 @@
     <button class="sub-btn" id="sub-btn">→</button>
   </div>
   <div class="feedback" id="feedback"></div>
+  <div class="feedback-note" id="feedback-note"></div>
 
   <div class="found-area" id="found-area"></div>
   <div class="unmatched-row" id="unmatched-row"></div>
@@ -298,6 +320,24 @@
 
   <div class="res-bd" id="res-bd"></div>
   <div class="next-note" id="next-note"></div>
+</div>
+
+<!-- WORD TIP MODAL -->
+<div id="word-tip">
+  <div class="wt-backdrop" id="wt-backdrop"></div>
+  <div class="wt-box">
+    <button class="wt-close" id="wt-close">✕</button>
+    <div class="wt-word" id="wt-word"></div>
+    <div class="wt-note" id="wt-note"></div>
+  </div>
+</div>
+
+<!-- MILESTONE TOAST -->
+<div id="milestone-toast">
+  <button class="mt-close" id="mt-close">✕</button>
+  <div class="mt-title">20 words found!</div>
+  <div class="mt-body" id="mt-body"></div>
+  <div class="mt-hint" id="mt-hint"></div>
 </div>
 
 <script>
@@ -475,36 +515,147 @@ const WORDS = [
     {name:'PER-',meaning:'through, thoroughly, completely',origin:'Latin per, "through, by means of"',
      forms:['per'],
      words:[
-       ['perfect',1],
-       ['perform',1],
-       ['permit',1],
-       ['persist',1],
-       ['perceive',1],
-       ['permeate',2],
-       ['pervade',2],
-       ['perplex',2],
-       ['persevere',2],
-       ['perennial',3],
-       ['perdition',3],
-     ]},
+       ['per',1,'the Latin preposition itself, meaning "through" or "by means of" — still alive in English in phrases like per diem and per capita'],
+       ['perfect',2,'this came from Latin per + facere (to make) — something thoroughly made is perfect!'],
+       ['perceive',2,'from Latin per + capere (to take) — to perceive is to take in information thoroughly'],
+       ['perish',2,'from Latin per + ire (to go)'],
+       ['pertain',2,'from Latin per + tenere (to hold)'],
+       ['perform',2,'from Latin per + forma (form, shape) — to perform is to carry something through from start to finish, shaping it as you go'],
+       ['permit',2,'from Latin per + mittere (to send) — to permit is to send someone through the barriers of rules and restrictions'],
+       ['persist',2,'from Latin per + sistere (to stand) — to persist is to stand through difficulties and obstacles'],
+       ['persuade',2,'from Latin per + suadere (to advise) — to persuade is to thoroughly advise someone until they see things your way'],
+       ['pervade',2,'from Latin per + vadere (to go) — to pervade is to go through and fill up a space completely, like a smell or a feeling'],
+       ['permeate',2,'from Latin per + meare (to pass through) — to permeate is to pass through something, often with the sense of spreading or saturating'],
+       ['perplex',2,'from Latin per + plexus (entwined) — to perplex is to entangle someone\'s thoughts thoroughly, leaving them confused'],
+       ['persevere',2,'from Latin per + severus (strict, serious) — to persevere is to hold strictly through difficulties without giving up'],
+       ['perennial',3,'from Latin per + annus (year) — something perennial lasts through the years, enduring or recurring regularly'],
+       ['perturb',3,'from Latin per + turbare (to disturb)'],
+       ['pervasive',3,'from Latin per + vas (vessel) — to be pervasive is to spread through like a liquid filling a vessel, thoroughly'],
+       ['perdition',3,'from Latin per + dare (to give) — perdition originally meant "complete loss" or "utter destruction," as if given over completely to ruin'],
+       ['perfunctory',3,'from Latin per + fungi (to perform) — something perfunctory is done thoroughly but without care or interest, as if just going through the motions'],
+       ['percolate',3,'from Latin per + colare (to strain) — to percolate is to strain liquid through something, as coffee through a filter'],
+       ['perfidious',3,'from Latin per + fides (faith) — a perfidious person is one who has thoroughly lost their faithfulness, betraying trust in a deep way'],
+       ['perforate',4,'from Latin per + forare (to bore) — to perforate is to bore a hole through something, creating a passage from one side to the other'],
+       ['perspicacious',5,'from Latin per + specere (to look) + -acious (having the quality of) — a perspicacious person is one who has the quality of looking through things clearly, being insightful and perceptive'],
+       ['perspicuity',5,'from Latin per + specere (to look) + -ity (quality of) — perspicuity is the quality of being clear and easy to understand, as if looking through something without distortion'],
+     ],
+      exclude:[
+        {word:'person', explanation:'from Latin persona (mask) — not the Latin prefix per-'},
+        {word:'personal', explanation:'from persona — not the Latin prefix per-'},
+        {word:'personality', explanation:'from persona — not the Latin prefix per-'},
+        {word:'personage', explanation:'from French/persona — not the Latin prefix per-'},
+        {word:'personnel', explanation:'from French personnel — not the Latin prefix per-'},
+        {word:'personify', explanation:'from persona — not the Latin prefix per-'},
+        {word:'persona', explanation:'from Latin persona (mask) — not the Latin prefix per-'},
+        {word:'periodic', explanation:'from Greek periodos — peri-/period is Greek, not Latin per-'},
+        {word:'period', explanation:'from Greek periodos — peri-/period is Greek, not Latin per-'},
+        {word:'perimeter', explanation:'from Greek peri- "around" + metron — not Latin per-'},
+        {word:'periphery', explanation:'from Greek peri- "around" + pherein — not Latin per-'},
+        {word:'periscope', explanation:'from Greek peri- "around" + skopein — not Latin per-'},
+        {word:'peril', explanation:'from Latin periculum — per- is not functioning as the productive prefix here'},
+        {word:'perhaps', explanation:'from Old English per hæp/happ — not the Latin per- prefix'},
+        {word:'perfume', explanation:'from Old French parfumer — per- here is not the Latin "through" prefix'},
+        {word:'persian', explanation:'proper noun (Persia) — unrelated to Latin per-'},
+        {word:'personable', explanation:'from persona — not the Latin prefix per-'},
+        {word:'paper', explanation:'from Latin papyrus/Old English papyr — contains "per" by coincidence'},
+        {word:'super', explanation:'from Latin super, "above" — not the Latin prefix per-'},
+        {word:'whisper', explanation:'from Old English hwisprian — unrelated to Latin per-'},
+        {word:'hopper', explanation:'from Old English hoppre — reduplication; not Latin per-'},
+        {word:'camper', explanation:'camp + -er agent suffix — not Latin per-'},
+        {word:'bumper', explanation:'from bump + -er — not Latin per-'},
+        {word:'expert', explanation:'from Latin expertus — -pert is not the productive prefix per-'},
+        {word:'rapper', explanation:'from rap + -er agent suffix — not Latin per-'},
+        {word:'jumper', explanation:'from jump + -er — not Latin per-'},
+        {word:'jasper', explanation:'proper noun/rock name — unrelated to Latin per-'},
+        {word:'temper', explanation:'from Latin temperare — root tem-, not prefix per-'},
+        {word:'supper', explanation:'from Old French souper — not Latin per-'},
+        {word:'whispering', explanation:'derivative of whisper — unrelated to Latin per-'},
+        {word:'campery', explanation:'adjectival form of camper — not Latin per-'},
+        {word:'imperial', explanation:'from Latin imperium — per is part of imper- root, not the prefix per-'},
+        {word:'operator', explanation:'from Latin operari "to work" — per not functioning as prefix'},
+        {word:'cooperate', explanation:'from Latin co- + operari "work" — not Latin per-'},
+        {word:'temperance', explanation:'same root as temper (tem-) — not Latin per-'},
+        {word:'periwig', explanation:'from French perruque — per- here is not Latin prefix'},
+        {word:'peridot', explanation:'from Arabic/different origin — per not a Latin prefix'},
+      ],     
+     },
     {name:'SPEC-',meaning:'to look, to see',origin:'Latin specere, "to look, to see"',
-     forms:['spec','spic','spy','spi'],
+     forms:['spec','spic','spy'],
      words:[
-       ['inspect',1],
-       ['expect',1],
-       ['respect',1],
-       ['suspect',1],
-       ['aspect',1],
-       ['spectacle',1],
-       ['speculate',2],
-       ['specimen',2],
-       ['species',2],
-       ['conspicuous',2],
-       ['despise',2],
-       ['auspicious',3],
-       ['espionage',3],
-       ['frontispiece',3],
-     ]},
+      ['inspect',2],
+      ['expect',2],
+      ['respect',2],
+      ['suspect',2],
+      ['aspect',2],
+      ['prospect',2],
+      ['speculate',2],
+      ['specimen',2],
+      ['species',2],
+      ['circumspect',2],
+      ['bishop',2,'from Greek episkopos, "overseer" — epi- (over) + skopos (watcher), from PIE *spek- (to observe) — a bishop is literally one who watches over the flock'],
+      ['despise',3,'from Latin de- (down, away) + specere (to look) — to despise is to look down on something, regarding it with contempt'],
+      ['despicable',3],
+      ['episcopal',3,'from Greek episkopos (overseer, bishop) — same PIE *spek- root, meaning one who watches over'],
+      ['especial',3],
+      ['scope',3],
+      ['skeptic',3,'from Greek skeptikos, "thoughtful, inquiring" — from skeptesthai (to look, consider), from PIE *spek- (to observe)'],
+      ['specious',2],
+      ['spectacular',2],
+      ['speculum',3,'a speculum is literally "a mirror" — something you look into, from Latin specere'],
+      ['spice',3,'from Latin species (appearance, kind) — spices were traded by "kind" or appearance; same root as species and specimen'],
+      ['suspicion',2],
+      ['suspicious',2],
+      ['inspection',1,'from Latin inspectare (to look at)'],
+      ['inspector',2],
+      ['introspect',2],
+      ['retrospect',2],
+      ['perspicacity',5],
+      ['perspicacious',3,'from Latin per + specere — to see clearly all the way through; both PER- and SPEC- at once'],
+      ['perspicuity',3,'from Latin per + specere — the quality of seeing through clearly; both PER- and SPEC- at once'],
+      ['spectrum',4,'from Latin spectrum, "appearance, image" — what you see when light is looked at through a prism'],
+      ['speculation',2],
+      ['spy',4,'from Old French espier, ultimately from a Germanic root related to Latin specere — to spy is to watch secretly'],
+      ['espy',4,'from Old French espier — to catch sight of something, the same root as spy and espionage'],
+      ['espionage',4,'from French espion, from the same Germanic-Latin root as spy — the organized practice of secret watching'],
+      ['scopophilia',4,'from Greek skopos (watcher) + philia (love) — PIE *spek- root — the compulsion to look'],
+      ['auspex',5,'from Latin avis (bird) + -spex (observer) — a priest who watched the flight of birds to read omens'],
+      ['auspices',5,'under the auspices of — literally "under the bird-watching of" — from auspex, the omen-reader'],
+      ['haruspex',5,'from Latin haru- (entrails) + -spex (observer) — a diviner who read omens in animal entrails; -spex is from specere'],
+      ['gyroscope',3,'from Greek gyros (circle) + skopos (watcher), from PIE *spek- — not Latin spec- but shares the same ancient root'],
+      ['telescope',2,'from Greek tele- (far) + skopos (watcher), from PIE *spek- — not Latin spec- but shares the same ancient root'],
+      ['horoscope',4,'from Greek hora (hour, season) + skopos (watcher), from PIE *spek- — a watcher of the hours; not Latin spec- but same root'],
+      ['conspicuous',4,'from Latin con- + specere (to look) — to be conspicuous is to attract the gaze completely, to be impossible not to look at'],
+      ['auspicious',5,'from Latin auspex, auspices — the root is avis (bird) + -pex (observer), from PIE *spek- — an auspicious event is one observed by favorable omens, originally by watching the flight of birds'],
+      ['frontispiece',5,'from Latin frontispicium, from frons (forehead) + specere (to look) — originally the facade of a building you face first; later the illustrated title page of a book'],
+     ],
+      exclude:[
+        {word:'respite', explanation:'"respite" likely traces through Old French respit — the connection to specere is disputed; best left aside'},
+        {word:'spin', explanation:'from Old English spinnan — not PIE *spek-'},
+        {word:'spider', explanation:'from Old English spīthra, "the spinner" — not PIE *spek-'},
+        {word:'spindle', explanation:'from Proto-Germanic *spannaz — not PIE *spek-'},
+        {word:'spinster', explanation:'agent noun from spinner + -ster — not PIE *spek-'},
+        {word:'spike', explanation:'from Germanic/Old Norse spika, "point" — not PIE *spek-'},
+        {word:'spine', explanation:'from Latin spina, "thorn, backbone" — unrelated to specere'},
+        {word:'spite', explanation:'from Middle Dutch spijt — unrelated to specere'},
+        {word:'spire', explanation:'from Old English spīr, "shoot, stalk" — unrelated to specere'},
+        {word:'spit', explanation:'from Old English spittan — unrelated to specere'},
+        {word:'spill', explanation:'from Old English spillan — unrelated to specere'},
+        {word:'spirit', explanation:'from Latin spīritus, "breath" — not PIE *spek-'},
+        {word:'spiral', explanation:'from Latin spira, "coil" — not PIE *spek-'},
+        {word:'inspire', explanation:'from Latin inspirare, "to breathe into" — not PIE *spek-'},
+        {word:'respire', explanation:'from Latin respirare, "to breathe" — not PIE *spek-'},
+        {word:'aspiration', explanation:'from Latin aspirare, "to breathe upon" — not PIE *spek-'},
+        {word:'spica', explanation:'Latin spīca, "ear of grain" — different root entirely'},
+        {word:'spicule', explanation:'from Latin spicula, "small spike" — not PIE *spek-'},
+        {word:'spiculate', explanation:'derived from spicule — unrelated to specere'},
+        {word:'hospice', explanation:'from Latin hospitium/hospes, "host/guest" — not PIE *spek-'},
+        {word:'hospital', explanation:'from Latin hospitalis — not PIE *spek-'},
+        {word:'hospitable', explanation:'from hospes/hospitium — unrelated to specere'},
+        {word:'aspirin', explanation:'from the plant name Spiraea — not PIE *spek-'},
+        {word:'aspic', explanation:'from French aspic — unrelated to specere'},
+        {word:'sphinx', explanation:'from Greek Sphinx — unrelated to PIE *spek-'},
+      ],      
+    },
   ],
   prompt:'PER- (through) + SPEC- (to look). To see clearly, you have to look all the way through.',
 },
@@ -831,6 +982,47 @@ function updateBonusLabel(ri) {
   }
 }
 
+// ── WORD TIP MODAL ───────────────────────────────────────────────
+function showWordTip(word, note) {
+  document.getElementById('wt-word').textContent = word;
+  document.getElementById('wt-note').textContent = note;
+  document.getElementById('word-tip').classList.add('show');
+}
+function closeWordTip() {
+  document.getElementById('word-tip').classList.remove('show');
+}
+document.getElementById('wt-close').addEventListener('click', closeWordTip);
+document.getElementById('wt-backdrop').addEventListener('click', closeWordTip);
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeWordTip(); });
+
+// ── MILESTONE TOAST ──────────────────────────────────────────────
+let _mtTimer = null;
+function showMilestone(ri) {
+  const root = today.roots[ri];
+  const color = C[ri].hex;
+  const forms = root.forms
+    .map(f => f.replace(/[\^$]/g,'').toUpperCase())
+    .filter((v,i,a)=>a.indexOf(v)===i)
+    .join(', ');
+
+  document.getElementById('mt-body').innerHTML =
+    `You've found <strong>20 words</strong> for <span style="color:${color};font-weight:700">${root.name}</span>. Common words no longer increase your score.`;
+  document.getElementById('mt-hint').textContent =
+    `Try rarer variations — look for: ${forms}`;
+
+  const toast = document.getElementById('milestone-toast');
+  toast.style.borderTop = `3px solid ${color}`;
+  toast.classList.add('show');
+
+  clearTimeout(_mtTimer);
+  _mtTimer = setTimeout(() => toast.classList.remove('show'), 7000);
+}
+
+document.getElementById('mt-close').addEventListener('click', () => {
+  document.getElementById('milestone-toast').classList.remove('show');
+  clearTimeout(_mtTimer);
+});
+
 // Player discovers a root via a word guess
 function discoverRoot(ri, animate=true) {
   if(revealedRoots.has(ri)) return; // already lit
@@ -894,41 +1086,66 @@ function stemWord(w) {
   return w;
 }
 
-// Returns the root index whose morpheme forms match this word, or null.
-function rootIndexByForms(word) {
+// Returns all root indices whose morpheme forms match this word (may be multiple).
+function rootIndicesByForms(word) {
+  const matches = [];
   for(let i=0;i<today.roots.length;i++) {
     const matched = today.roots[i].forms.some(f => new RegExp(f,'i').test(word));
-    if(matched) return i;
+    if(matched) matches.push(i);
   }
-  return null;
+  return matches;
 }
 
 // ── SUBMISSION ───────────────────────────────────────────────────
-function acceptWord(ri, word, tier) {
-  const wasNewRoot = !revealedRoots.has(ri);
-  foundByRoot[ri].push({word, pts:tier});
-  discoverRoot(ri);
-  addTag(ri, word, tier, true);
+function acceptWord(riList, word, tier) {
+  // riList may be a single index (number) or array of indices
+  if (!Array.isArray(riList)) riList = [riList];
+
+  let newRootFound = false;
+  riList.forEach(ri => {
+    const wasNewRoot = !revealedRoots.has(ri);
+    if (wasNewRoot) newRootFound = true;
+    foundByRoot[ri].push({word, pts: tier});
+    discoverRoot(ri);
+    addTag(ri, word, tier, true);
+  });
+
   updateStats();
   save();
-  if(wasNewRoot) {
-    showFb(`🌟 New root found! +${tier} pt${tier>1?'s':''} +3 root bonus`,'great');
-  } else if(tier===5) {
-    showFb(`✦✦✦✦✦ Exceptional find! +5 pts`,'great');
-  } else if(tier===4) {
-    showFb(`✦✦✦✦ Rare find! +4 pts`,'great');
-  } else if(tier===3) {
-    showFb(`✦✦✦ Nice find! +3 pts`,'great');
-  } else if(tier===2) {
-    showFb(`✦✦ +2 pts`,'good');
+
+  // Feedback message — mention if multiple roots were hit
+  if (newRootFound && riList.length > 1) {
+    showFb(`🌟 Two roots at once! +${tier} pt${tier>1?'s':''} each +3 bonus per new root`, 'great');
+  } else if (newRootFound) {
+    showFb(`🌟 New root found! +${tier} pt${tier>1?'s':''} +3 root bonus`, 'great');
+  } else if (riList.length > 1) {
+    showFb(`✨ Hits two roots! +${tier} pt${tier>1?'s':''} × 2`, 'great');
+  } else if (tier===5) {
+    showFb(`✦✦✦✦✦ Exceptional find! +5 pts`, 'great');
+  } else if (tier===4) {
+    showFb(`✦✦✦✦ Rare find! +4 pts`, 'great');
+  } else if (tier===3) {
+    showFb(`✦✦✦ Nice find! +3 pts`, 'great');
+  } else if (tier===2) {
+    showFb(`✦✦ +2 pts`, 'good');
   } else {
-    showFb(`✦ +1 pt`,'good');
+    showFb(`✦ +1 pt`, 'good');
   }
-  // Show note if curated word has one
-  const entry = today.roots[ri]?.words?.find(([w])=>w.toLowerCase()===word.toLowerCase());
-  if(entry && entry[2]) {
-    setTimeout(()=>showFb(entry[2],'note'),400);
+
+  // Curated note (use first matching root's entry) — shown on separate line
+  const firstRi = riList[0];
+  const entry = today.roots[firstRi]?.words?.find(([w]) => w.toLowerCase() === word.toLowerCase());
+  if (entry && entry[2]) {
+    showNote(entry[2]);
   }
+
+  // Milestone: check if any root just crossed 20 words for the first time
+  riList.forEach(ri => {
+    const count = foundByRoot[ri].length;
+    if (count === 20) {
+      setTimeout(() => showMilestone(ri), 600);
+    }
+  });
 }
 
 async function submit() {
@@ -936,6 +1153,7 @@ async function submit() {
   const raw = input.value.trim().toLowerCase();
   input.value = '';
   if(!raw || raw.length < 2) return;
+  document.getElementById('feedback-note').textContent = '';
 
   // Already found? (exact or stemmed variant)
   const rawStem = stemWord(raw);
@@ -947,10 +1165,19 @@ async function submit() {
   }
   if(unmatched.includes(raw)) { showFb(`Already tried "${raw}".`,'already'); return; }
 
-  // 1. Check curated list — preserves tiered scoring for known words
-  for(let i=0;i<today.roots.length;i++) {
-    const entry = today.roots[i].words.find(([w])=>w.toLowerCase()===raw);
-    if(entry) { acceptWord(i, raw, entry[1]); return; }
+  // 1. Check curated list — collect ALL roots this word appears in
+  {
+    const matchedRoots = [];
+    for(let i=0;i<today.roots.length;i++) {
+      const entry = today.roots[i].words.find(([w])=>w.toLowerCase()===raw);
+      if(entry) matchedRoots.push({ri:i, tier:entry[1]});
+    }
+    if(matchedRoots.length > 0) {
+      // Use the highest tier across all matched roots
+      const tier = Math.max(...matchedRoots.map(m=>m.tier));
+      acceptWord(matchedRoots.map(m=>m.ri), raw, tier);
+      return;
+    }
   }
 
   // 2. Check exclusion lists — false cognates that share a string but not a root
@@ -977,9 +1204,9 @@ async function submit() {
   }
 
   // 3. Real word — does it match any root's morpheme patterns?
-  const formRI = rootIndexByForms(raw);
-  if(formRI !== null) {
-    acceptWord(formRI, raw, 1); // open-ended finds score as tier 1
+  const formRIs = rootIndicesByForms(raw);
+  if(formRIs.length > 0) {
+    acceptWord(formRIs, raw, 1); // open-ended finds score as tier 1
     return;
   }
 
@@ -997,6 +1224,16 @@ function addTag(ri, word, pts, animate) {
   if(!animate) t.style.animation='none';
   const ptLabel = pts===5?'✦✦✦✦✦':pts===4?'✦✦✦✦':pts===3?'✦✦✦':pts===2?'✦✦':'✦';
   t.innerHTML = `${word}<span class="ftag-pts">${ptLabel}</span>`;
+
+  // Attach note if this word has one in any root's curated list
+  const entry = today.roots.flatMap(r => r.words).find(([w]) => w.toLowerCase() === word.toLowerCase());
+  const note = entry?.[2];
+  if(note) {
+    t.classList.add('has-note');
+    t.title = 'click for etymology';
+    t.addEventListener('click', () => showWordTip(word, note));
+  }
+
   flow.appendChild(t);
 }
 
@@ -1023,12 +1260,12 @@ function updateStats() {
 
 function updateRankBar(score) {
   const RANKS = [
-    { label: 'Etymophiliac', min: 0.75 },
-    { label: 'Word Freak',   min: 0.64 },
-    { label: 'Philologist',  min: 0.50 },
-    { label: 'Wordy',        min: 0.34 },
-    { label: 'Root Hoarder', min: 0.18 },
-    { label: 'Word Curious', min: 0.07 },
+    { label: 'Etymophiliac', min: 0.50 },
+    { label: 'Word Freak',   min: 0.41 },
+    { label: 'Philologist',  min: 0.33 },
+    { label: 'Wordy',        min: 0.20 },
+    { label: 'Root Hoarder', min: 0.10 },
+    { label: 'Word Curious', min: 0.05 },
     { label: 'Etymophobe',   min: 0 },
   ];
   const max = today.roots.reduce((t,r) => t + r.words.reduce((s,w) => s + w[1], 0), 0);
@@ -1056,11 +1293,19 @@ function updateRankBar(score) {
 }
 
 let _fbTimer = null;
-function showFb(msg,type) {
-  const fb=document.getElementById('feedback');
-  if(_fbTimer) { clearTimeout(_fbTimer); _fbTimer=null; }
-  fb.textContent=msg; fb.className=`feedback ${type}`;
-  if(type!=='bad' && type!=='note') _fbTimer=setTimeout(()=>{fb.textContent='';fb.className='feedback';},2000);
+let _noteTimer = null;
+
+function showFb(msg, type) {
+  const fb = document.getElementById('feedback');
+  if(_fbTimer) { clearTimeout(_fbTimer); _fbTimer = null; }
+  fb.textContent = msg; fb.className = `feedback ${type}`;
+  if(type !== 'bad') _fbTimer = setTimeout(() => { fb.textContent=''; fb.className='feedback'; }, 2500);
+}
+
+function showNote(msg) {
+  const el = document.getElementById('feedback-note');
+  if(_noteTimer) { clearTimeout(_noteTimer); _noteTimer = null; }
+  el.textContent = msg;
 }
 
 document.getElementById('sub-btn').addEventListener('click',()=>submit());
@@ -1155,9 +1400,9 @@ function showResults() {
   const maxScoreShare = today.roots.reduce((t,r)=>t+r.words.reduce((s,w)=>s+w[1],0),0);
   const pctShare = maxScoreShare > 0 ? score / maxScoreShare : 0;
   const ranksShare = [
-    {label:'Etymophiliac',min:0.75},{label:'Word Freak',min:0.64},
-    {label:'Philologist',min:0.50},{label:'Wordy',min:0.34},
-    {label:'Root Hoarder',min:0.18},{label:'Word Curious',min:0.07},
+    {label:'Etymophiliac',min:0.50},{label:'Word Freak',min:0.41},
+    {label:'Philologist',min:0.33},{label:'Wordy',min:0.20},
+    {label:'Root Hoarder',min:0.10},{label:'Word Curious',min:0.05},
     {label:'Etymophobe',min:0},
   ];
   const rankShare = ranksShare.find(r=>pctShare>=r.min)||ranksShare[ranksShare.length-1];
@@ -1185,12 +1430,12 @@ function showResults() {
   }, 0);
   const pct = maxScore > 0 ? score / maxScore : 0;
   const ranks = [
-    { label: 'Etymophiliac', min: 0.75 },
-    { label: 'Word Freak',   min: 0.64 },
-    { label: 'Philologist',  min: 0.50 },
-    { label: 'Wordy',        min: 0.34 },
-    { label: 'Root Hoarder', min: 0.18 },
-    { label: 'Word Curious', min: 0.07 },
+    { label: 'Etymophiliac', min: 0.50 },
+    { label: 'Word Freak',   min: 0.41 },
+    { label: 'Philologist',  min: 0.33 },
+    { label: 'Wordy',        min: 0.20 },
+    { label: 'Root Hoarder', min: 0.10 },
+    { label: 'Word Curious', min: 0.05 },
     { label: 'Etymophobe',   min: 0 },
   ];
   const rank = ranks.find(r => pct >= r.min) || ranks[ranks.length-1];

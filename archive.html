@@ -353,6 +353,27 @@ const ARCHIVE = [
 
   // ↓↓↓ PASTE NEW ENTRIES AT THE TOP ↓↓↓
 {
+    id: 4,
+    date: "March 12, 2026",
+    word: "RECOMPENSE",
+    segments: [
+      { text: "RE", ri: 0 },
+      { text: "COM", ri: 1 },
+      { text: "PENS", ri: 2 },
+      { text: "E", ri: -1 },
+    ],
+    roots: [
+      { name: "RE-", meaning: "back, again", color: 0 },
+      { name: "COM-", meaning: "together, with", color: 1 },
+      { name: "PENS-", meaning: "to hang, weigh, pay", color: 2 },
+    ],
+    topScore: 83,
+    mostWords: 166,
+    coins: [
+      { word: "recompensieve", def: "to ponder the things we owe each other" },
+    ],
+  },
+{
     id: 3,
     date: "March 11, 2026",
     word: "ARTIFICIAL",
@@ -477,8 +498,11 @@ function render() {
 
     // Stats HTML
 	let statsHTML = '';
-	if (entry.topScore != null) {
-  	statsHTML = `<div class="entry-stats"><div class="estat"><span>${entry.topScore}</span>high score</div></div>`;
+	if (entry.topScore != null || entry.mostWords != null) {
+      const parts = [];
+      if (entry.topScore != null) parts.push(`<div class="estat"><span>${entry.topScore}</span>high score</div>`);
+      if (entry.mostWords != null) parts.push(`<div class="estat"><span>${entry.mostWords}</span>most words found</div>`);
+  	  statsHTML = `<div class="entry-stats">${parts.join('')}</div>`;
 	}
     const noteHTML = entry.note
       ? `<div class="entry-note">${entry.note}</div>`
