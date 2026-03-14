@@ -222,14 +222,11 @@
     <div style="font-size:.65rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-light);margin-bottom:.5rem;">How to play</div>
     <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:var(--ink);margin-bottom:.7rem;line-height:1.2;">Every word has roots.<br>Find them.</div>
     <div style="font-size:.88rem;color:var(--ink-mid);margin-bottom:1.2rem;line-height:1.6;">To play, type any word that feels like it has a shared history with the target word. You score points by finding <em>more</em> words with a shared root, especially <em>rare</em> ones. Good luck!</div>
-    <div style="display:flex;flex-direction:column;gap:.85rem;font-size:.84rem;color:var(--ink-mid);line-height:1.6;">
-      <div><strong style="color:var(--ink);">The target word</strong> is broken into segments — type words to light them up and discover what each root means.</div>
-      <div><strong style="color:var(--ink);">Type any word</strong> you think shares a root. If it does, that root lights up and you score points.</div>
-      <div><strong style="color:var(--ink);">Gray segments</strong> are connective tissue — Latin glue that holds the word together. Not scored, just shown for clarity.</div>
-      <div><strong style="color:var(--ink);">Reveal a root</strong> if you're stuck — but finding it yourself first earns a <strong>+3 bonus</strong>. 🌟</div>
-      <div><strong style="color:var(--ink);">Rarer words</strong> score more: ✦ open find · ✦✦ good · ✦✦✦ great · ✦✦✦✦ rare · ✦✦✦✦✦ exceptional</div>
-      <div><strong style="color:var(--ink);">Top 20 words per root</strong> count toward your score — so finding rarer words matters more than volume.</div>
-    </div>
+    <ol style="display:flex;flex-direction:column;gap:.75rem;font-size:.84rem;color:var(--ink-mid);line-height:1.6;padding-left:1.3rem;">
+      <li>Keep guessing words that share a root to earn more points. Rarer words score higher.</li>
+      <li>Top 20 words per root count toward your score, so quality matters more than quantity.</li>
+      <li>Rank up to impress your friends with how wordy you are.</li>
+    </ol>
     <button id="help-got-it" style="margin-top:1.4rem;width:100%;background:var(--ink);color:white;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.84rem;font-weight:500;padding:.65rem;cursor:pointer;">Got it</button>
   </div>
 </div>
@@ -672,7 +669,7 @@ const WORDS = [
     id:6,
     segments:[{text:'ABS',ri:0},{text:'TRACT',ri:1}],
     roots:[
-      {name:'AB-', meaning:'away from, off, apart', origin:'Latin ab/abs, "away from, off"',
+      {name:'ABS-', meaning:'away from, off, apart', origin:'Latin ab/abs, "away from, off"',
  forms:['^ab','^abs'],
  words:[
    ['absent',1],
@@ -835,7 +832,7 @@ const WORDS = [
 },
 
     ],
-    prompt:'AB- (away) + TRACT- (pull). Something pulled apart or drawn away that needs a name?',
+    prompt:'ABS- (away) + TRACT- (pull). Something pulled apart or drawn away that needs a name?',
   },
   {
     id:7,
