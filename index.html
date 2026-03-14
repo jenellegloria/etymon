@@ -241,6 +241,7 @@
       <div class="rank-bar-fill" id="rank-bar-fill"></div>
     </div>
   </div>
+  <div id="community-stats" style="font-size:.72rem;color:var(--ink-light);font-style:italic;text-align:center;min-height:1rem;margin-bottom:.6rem;"></div>
 
   <div class="word-section">
     <div class="target-word" id="target-word"></div>
@@ -329,6 +330,8 @@
   <div class="mt-hint" id="mt-hint"></div>
 </div>
 
+<script src="puzzles.js"></script>
+<script src="submissions.js"></script>
 <script>
 // ── COLORS ───────────────────────────────────────────────────────
 const C = [
@@ -339,599 +342,21 @@ const C = [
   {cls:'r4',hex:'#DB2777',pale:'#FCE7F3'},
 ];
 
-// Word tiers: 1=common, 2=good find, 3=rare/impressive
-// Each word entry: [word, tier]
-const WORDS = [
-  {
-    id:1,
-    segments:[{text:'OB',ri:0},{text:'FUSC',ri:1},{text:'ATE',ri:-1}],
-    roots:[
-      {name:'OB-',meaning:'against, toward, in the way of',origin:'Latin ob, "against, before"',
-       forms:['^ob'],
-       words:[['object',1],['obstruct',1],['obscure',1],['obtain',1],['observe',1],['obvious',1],['oblique',2],['obstacle',1],['obliterate',2],['obstinate',2],['obtrude',3],['obverse',3],['obviate',2],['oblivious',1],['obsess',1],['occlude',3],['oppose',1],['occur',1]]},
-      {name:'FUSC-',meaning:'to darken, make dusky',origin:'Latin fuscus, "dark, dusky" — cognate with English "dusk"',
-       forms:['fusc'],
-       words:[['obfuscation',1],['obfuscatory',2],['fuscous',2],['subfusc',3],['infuscate',3]]},
-    ],
-    prompt:'OB- (against) + FUSC- (dark). Note: FUSC- has nothing to do with FUS- (to pour) — they just look alike. Coin a word about false appearances, darkness, or things that aren\'t what they seem.',
-  },
-  {
-    id:2,
-    segments:[{text:'CORPUS',ri:0},{text:'CLE',ri:1}],
-    roots:[
-      {name:'CORPUS-',meaning:'body',origin:'Latin corpus, "body"',
-       forms:['corp','cors'],
-       words:[['corpse',1],['corporal',1],['corpora',2],['corporation',1],['incorporate',1],['corps',1],['corporeal',2],['corsage',2],['corpus',1],['corpulent',2],['corpulence',2],['incorporeal',2],['corse',3],['corset',2],['habeas corpus',3]]},
-      {name:'-CLE',meaning:'small, little (diminutive)',origin:'Latin -culus/-cula/-culum',
-       forms:['cle$','cule$','cul'],
-       words:[['molecule',1],['particle',1],['follicle',2],['tentacle',1],['cubicle',1],['article',1],['minuscule',2],['ridicule',2],['reticule',3],['ossicle',3],['ventricle',2],['testicle',2],['versicle',3],['fascicle',3],['auricle',3],['carbuncle',2],['barnacle',2],['pinnacle',2],['spectacle',1],['obstacle',1],['receptacle',2],['capsule',1],['module',1],['globule',2],['nodule',2],['granule',2],['tubule',3],['pustule',3]]},
-    ],
-    prompt:'CORPUS (body) + -CLE (little). Coin a word about bodies, smallness, or little things that matter.',
-  },
-{
-  id:3,
-  segments:[{text:'ART',ri:0},{text:'I',ri:-1},{text:'FIC',ri:1},{text:'IAL',ri:-1}],
-  roots:[
-    {name:'ART-',meaning:'skill, craft, art',origin:'Latin ars/artis, "skill, craft"',
-     forms:['art'],
-     words:[['art',1],['artist',1],['artisan',2],['artistry',2],['artifice',2],['artifact',1],['artefact',2],['artful',2],['artless',2],['artwork',1],['inert',3],['inertia',3]]},
-    {name:'-FIC-',meaning:'to make, do (from Latin facere)',origin:'Latin facere, "to make, do" — appears as fac-, fic-, fec-, -fy',
-     forms:['fac','fic','fec','fy'],
-     words:[['fact',1],['factor',1],['factory',1],['effect',1],['defect',1],['perfect',1],['infect',1],['affect',1],['manufacture',2],['fiction',1],['efficient',1],['sufficient',1],['beneficial',2],['feasible',2],['feat',3],['feature',1],['justify',2],['clarify',2,'from clarus (clear, distinct) + combining form of facere (to make, to do)'],['terrify',1],['purify',2,'great job'],['magnify',2,'-fy sure is a productive suffix'],['glorify',2],['rectify',2],['fortify',2],['satisfy',2],['facsimile',3],['pacific',3],['specific',2,'nice'],['prolific',2],['facile',2,'you are doing so great'],['facade',2,'wowzers'],['sacrifice',2],['office',1,'from the Latin opiFICium - literally, work-doing']]},
-  ],
-  prompt:'ART- (skill) + -FIC- (to make). Coin a word for something skillfully — or not so skillfully — made.',
-},
-{
-  id: 4,
-  segments:[{text:'RE',ri:0},{text:'COM',ri:1},{text:'PENS',ri:2},{text:'E',ri:-1}],
-  roots:[
-    {
-      name:'RE-',
-      meaning:'back, again; against',
-      origin:'Latin re-, inseparable prefix meaning "back, again, anew"',
-      forms:['^re','^red'],
-      words:[
-        ['return',1],['rebuild',1],['reflect',1],['reform',1],['replace',1],
-        ['restore',1],['reverse',1],['repeat',1],['remind',1],['refill',1],
-        ['rewrite',1],['reset',1],['reuse',1],['recall',1],
-        ['reconcile',2],['reconsider',2],['renovate',2],['reciprocal',2],
-        ['redeem',2],['redundant',2],['revoke',2],['recant',2],
-        ['restitution',3],['revert',3],['redress',3],['redact',3],
-        ['rebel',3],['remnant',3],['resilient',3],
-        ['render',4,'from Latin reddere, "give back" — the red- form of re- before vowels, worn smooth by centuries of use'],
-        ['ransom',4,'a doublet of redemption — the re- prefix shrank to r- over centuries of use'],
-        ['redintegrate',4],
-        ['redolent',5,'from Latin redolere, "to emit a smell" — re- here is intensive, meaning "thoroughly smelling"'],
-        ['religion',5,'possibly from Latin religare, "to bind back" — disputed, but the re- has long since dissolved into the word'],
-      ],
-      exclude:[
-        {word:'read', explanation:'"read" is from Old English rǣdan — the re is part of the original word, not the Latin prefix'},
-        {word:'recompense', explanation:'that is the word itself!'},
-        {word:'reading', explanation:'"read" is from Old English rǣdan — the re is part of the original word, not the Latin prefix'},
-        {word:'reader', explanation:'"read" is from Old English rǣdan — the re is part of the original word, not the Latin prefix'},
-        {word:'reed', explanation:'"reed" is from Old English hrēod — unrelated to Latin re-'},
-        {word:'real', explanation:'"real" is from Latin res (thing) — the re is not a prefix here'},
-        {word:'really', explanation:'"real" is from Latin res (thing) — the re is not a prefix here'},
-        {word:'reality', explanation:'"real" is from Latin res (thing) — the re is not a prefix here'},
-        {word:'rear', explanation:'"rear" is from Old English rǣran — unrelated to Latin re-'},
-        {word:'reach', explanation:'"reach" is from Old English rǣcan — unrelated to Latin re-'},
-        {word:'realm', explanation:'"realm" is from Old French reaume — the re is not the Latin prefix'},
-        {word:'reel', explanation:'"reel" is from Old English — unrelated to Latin re-'},
-        {word:'reek', explanation:'"reek" is from Old English rēocan — unrelated to Latin re-'},
-        {word:'reign', explanation:'"reign" is from Latin regnum (kingdom) — the re is not a prefix'},
-        {word:'rein', explanation:'"rein" is from Old French rene — unrelated to Latin re-'},
-        {word:'reins', explanation:'"reins" is from Old French rene — unrelated to Latin re-'},
-        {word:'rent', explanation:'"rent" is from Old French rente — the re is not the Latin prefix'},
-        {word:'rest', explanation:'"rest" is from Old English — unrelated to Latin re-'},
-      ],
-    },
-    {
-      name:'COM-',
-      meaning:'together, with',
-      origin:'Latin com-, assimilates to con-, col-, cor-, co- depending on following letter',
-      forms:['^com','^con','^col','^cor','^co'],
-      words:[
-        ['combine',1],['connect',1],['collect',1],['community',1],['cooperate',1],
-        ['coexist',1],['compete',1],['complete',1],['compare',1],['compose',1],
-        ['collaborate',2],['correspond',2,'"correspond" contains cor- + respondere (to answer) — the -spond is from spondere (to pledge), not pendere. but the cor- is from the same Latin root as com- so it counts.'],['colleague',2],['compile',2],
-        ['convene',2],['converge',2],['console',2],['conspire',2],['concord',2],
-        ['confluence',3],['congruent',3],['consonant',3],['collateral',3],
-        ['commensurate',3],['coalesce',3],['concatenate',3],
-        ['compendium',4],['comity',4],['concomitant',4],
-        ['consanguine',5,'from Latin con- + sanguis (blood) — "of the same blood," the COM- prefix meaning togetherness at its most literal'],
-      ],
-      exclude:[
-        {word:'comedy', explanation:'"comedy" is from Greek kōmōidia — unrelated to Latin com-'},
-        {word:'comet', explanation:'"comet" is from Greek komētēs — unrelated to Latin com-'},
-        {word:'coral', explanation:'"coral" is from Greek korallion — the cor here is not the Latin prefix'},
-        {word:'corner', explanation:'"corner" is from Latin cornu (horn) — the cor is not the prefix com-'},
-        {word:'corn', explanation:'"corn" is from Old English — unrelated to Latin com-'},
-        {word:'copy', explanation:'"copy" is from Latin copia (abundance) — the co is not the prefix com-'},
-        {word:'cord', explanation:'"cord" is from Old French corde — unrelated to Latin com-'},
-        {word:'coat', explanation:'"coat" is from Old French cote — unrelated to Latin com-'},
-        {word:'coast', explanation:'"coast" is from Old French coste — unrelated to Latin com-'},
-        {word:'cobra', explanation:'"cobra" is from Portuguese, from Latin colubra (snake) — the col is not the prefix com-'},
-      ],
-    },
-    {
-      name:'PENS-',
-      meaning:'to hang, weigh, pay',
-      origin:'Latin pendere "to hang," pensare "to weigh, consider" — from PIE *(s)pen- "to draw, stretch, spin"',
-      // note: 'ponder' catches both ponder and ponderous; avoid bare 'pond' which catches respond, correspond
-      forms:['pens','pend','pois','ponder','peso','spin','span'],
-      words:[
-        ['depend',1],['suspend',1],['spend',1],['pension',1],['expensive',1],
-        ['expense',1],['pending',1],
-        ['pensive',2],['pendant',2],['pendulum',2],['suspense',2],['compensate',2],
-        ['dispense',2],['append',2],['appendix',2],['impend',2],
-        ['propensity',3],['stipend',3],['perpendicular',3],['poise',3],
-        ['ponder',3],['compendium',3],
-        ['span',3,'from Old English spannan, from the same PIE root — to span something is to measure its weight and extent'],
-        ['ponderous',4],
-        ['peso',4,'the currency — from Latin pensum, "something weighed out," the same root as pension and pensive'],
-        ['spinster',4,'originally a woman who spins thread — from the PIE root meaning to draw and stretch fiber'],
-        ['preponderant',4],['counterpoise',4],
-        ['pound',4,'the unit of weight — from Latin pondo, "by weight," sharing the same root as pendulum and pension'],
-        ['pansy',5,'from French pensée, "thought" — the flower was named for its contemplative, pensive face'],
-        ['spider',5,'from Old English spiðra, literally "the spinner" — same PIE root as spin, spindle, and spinster'],
-        ['penthouse',5,'not from "pent up" — from Old French apentis, something hanging or leaning against a wall'],
-        ['equipoise',5],
-        ['avoirdupois',5,'from Old French aveir de peis, "goods of weight" — peis is Latin pensum, the same root as pension and pensive, hiding in plain sight'],
-      ],
-      exclude:[
-        {word:'pen', explanation:'"pen" is from Latin penna (feather) — unrelated to pendere'},
-        {word:'pens', explanation:'"pen" is from Latin penna (feather) — unrelated to pendere'},
-        {word:'pencil', explanation:'"pencil" is from Latin penicillus (little brush) — unrelated to pendere'},
-        {word:'penalty', explanation:'"penalty" is from Latin poena (punishment) — unrelated to pendere'},
-        {word:'penal', explanation:'"penal" is from Latin poena (punishment) — unrelated to pendere'},
-        {word:'poison', explanation:'"poison" looks like poise but comes from Latin potionem (a drink) — a false friend'},
-        {word:'poisonous', explanation:'"poison" looks like poise but comes from Latin potionem (a drink) — a false friend'},
-        {word:'pond', explanation:'"pond" (body of water) is from Old English — unrelated to Latin pendere'},
-        {word:'ponds', explanation:'"pond" (body of water) is from Old English — unrelated to Latin pendere'},
-        {word:'respond', explanation:'"respond" is from Latin respondere (to answer) — the -spond is from spondere (to pledge), not pendere'},
-        {word:'correspond', explanation:'"correspond" contains cor- + respondere (to answer) — the -spond is from spondere (to pledge), not pendere'},
-        {word:'despondent', explanation:'"despondent" is from Latin despondere (to give up) — from spondere (to pledge), not pendere'},
-      ],
-    },
-  ],
-  prompt:'RE- (back) + COM- (together) + PENS- (weigh). To recompense is to weigh out payment again. Coin a word about debts, balances, or the things we owe each other.',
-},
 
-{
-  id: 5,
-  segments: [{text:'PER',ri:0},{text:'SPEC',ri:1},{text:'TIVE',ri:-1}],
-  roots: [
-    {name:'PER-',meaning:'through, thoroughly, completely',origin:'Latin per, "through, by means of"',
-     forms:['^per'],
-     words:[
-       ['per',1,'the Latin preposition itself, meaning "through" or "by means of" — still alive in English in phrases like per diem and per capita'],
-       ['perfect',2,'this came from Latin per + facere (to make) — something thoroughly made is perfect!'],
-       ['perceive',2,'from Latin per + capere (to take) — to perceive is to take in information thoroughly'],
-       ['perish',2,'from Latin per + ire (to go)'],
-       ['pertain',2,'from Latin per + tenere (to hold)'],
-       ['perform',2,'from Latin per + forma (form, shape) — to perform is to carry something through from start to finish, shaping it as you go'],
-       ['permit',2,'from Latin per + mittere (to send) — to permit is to send someone through the barriers of rules and restrictions'],
-       ['persist',2,'from Latin per + sistere (to stand) — to persist is to stand through difficulties and obstacles'],
-       ['persuade',2,'from Latin per + suadere (to advise) — to persuade is to thoroughly advise someone until they see things your way'],
-       ['pervade',2,'from Latin per + vadere (to go) — to pervade is to go through and fill up a space completely, like a smell or a feeling'],
-       ['permeate',2,'from Latin per + meare (to pass through) — to permeate is to pass through something, often with the sense of spreading or saturating'],
-       ['perplex',2,'from Latin per + plexus (entwined) — to perplex is to entangle someone\'s thoughts thoroughly, leaving them confused'],
-       ['persevere',2,'from Latin per + severus (strict, serious) — to persevere is to hold strictly through difficulties without giving up'],
-       ['imperfect',2,'from Latin in + per + facere — not thoroughly made; the per- is the same root as in perfect'],
-       ['imperfection',2,'from Latin in + per + facere — the state of not being thoroughly made'],
-       ['perfume',2,'from Latin per + fumare (to smoke) — to perfume is to send smoke or scent thoroughly through a space'],
-       ['perennial',3,'from Latin per + annus (year) — something perennial lasts through the years, enduring or recurring regularly'],
-       ['perturb',3,'from Latin per + turbare (to disturb)'],
-       ['pervasive',3,'from Latin per + vas (vessel) — to be pervasive is to spread through like a liquid filling a vessel, thoroughly'],
-       ['perdition',3,'from Latin per + dare (to give) — perdition originally meant "complete loss" or "utter destruction," as if given over completely to ruin'],
-       ['perfunctory',3,'from Latin per + fungi (to perform) — something perfunctory is done thoroughly but without care or interest, as if just going through the motions'],
-       ['percolate',3,'from Latin per + colare (to strain) — to percolate is to strain liquid through something, as coffee through a filter'],
-       ['perfidious',3,'from Latin per + fides (faith) — a perfidious person is one who has thoroughly lost their faithfulness, betraying trust in a deep way'],
-       ['imperceptible',3,'from Latin in + per + capere (to take) — not able to be taken in thoroughly; too subtle to perceive'],
-       ['pergola',3,'from Italian pergola, from Latin pergula (projecting roof) — the per- is the Latin prefix, meaning something that extends through or out from a structure'],
-       ['perforate',4,'from Latin per + forare (to bore) — to perforate is to bore a hole through something, creating a passage from one side to the other'],
-       ['periwinkle',4,'from Latin pervinca, likely from pervincire — per (thoroughly) + vincire (to bind) — the plant that thoroughly binds and entwines as it creeps across the ground'],
-       ['perspicacious',5,'from Latin per + specere (to look) + -acious (having the quality of) — a perspicacious person is one who has the quality of looking through things clearly, being insightful and perceptive'],
-       ['perspicuity',5,'from Latin per + specere (to look) + -ity (quality of) — perspicuity is the quality of being clear and easy to understand, as if looking through something without distortion'],
-     ],
-      exclude:[
-        {word:'person', explanation:'from Latin persona (mask) — not the Latin prefix per-'},
-        {word:'personal', explanation:'from persona — not the Latin prefix per-'},
-        {word:'personality', explanation:'from persona — not the Latin prefix per-'},
-        {word:'personage', explanation:'from French/persona — not the Latin prefix per-'},
-        {word:'personnel', explanation:'from French personnel — not the Latin prefix per-'},
-        {word:'personify', explanation:'from persona — not the Latin prefix per-'},
-        {word:'persona', explanation:'from Latin persona (mask) — not the Latin prefix per-'},
-        {word:'personable', explanation:'from persona — not the Latin prefix per-'},
-        {word:'periodic', explanation:'from Greek periodos — peri- is Greek "around," not Latin per-'},
-        {word:'period', explanation:'from Greek periodos — peri- is Greek "around," not Latin per-'},
-        {word:'perimeter', explanation:'from Greek peri- "around" + metron — not Latin per-'},
-        {word:'periphery', explanation:'from Greek peri- "around" + pherein — not Latin per-'},
-        {word:'peripheral', explanation:'from Greek peri- "around" + pherein — not Latin per-'},
-        {word:'periscope', explanation:'from Greek peri- "around" + skopein — not Latin per-'},
-        {word:'perinatal', explanation:'from Greek peri- "around" + Latin natalis — the peri- here is Greek, not Latin per-'},
-        {word:'perihelion', explanation:'from Greek peri- "around" + helios (sun) — Greek peri-, not Latin per-'},
-        {word:'perihelium', explanation:'from Greek peri- "around" + helios (sun) — Greek peri-, not Latin per-'},
-        {word:'peripatetic', explanation:'from Greek peri- "around" + patein (to walk) — Greek peri-, not Latin per-'},
-        {word:'pericardium', explanation:'from Greek peri- "around" + kardia (heart) — Greek peri-, not Latin per-'},
-        {word:'peristyle', explanation:'from Greek peri- "around" + stylos (column) — Greek peri-, not Latin per-'},
-        {word:'peristalsis', explanation:'from Greek peri- "around" + stellein (to compress) — Greek peri-, not Latin per-'},
-        {word:'peril', explanation:'from Latin periculum — per- is not functioning as the productive prefix here'},
-        {word:'perilous', explanation:'from Latin periculum — same root as peril; per- is not the productive prefix here'},
-        {word:'perilously', explanation:'from Latin periculum — same root as peril; per- is not the productive prefix here'},
-        {word:'perhaps', explanation:'from Old English per hæp/happ — not the Latin per- prefix'},
-        {word:'persian', explanation:'proper noun (Persia) — unrelated to Latin per-'},
-        {word:'paper', explanation:'from Latin papyrus/Old English papyr — contains "per" by coincidence'},
-        {word:'super', explanation:'from Latin super, "above" — not the Latin prefix per-'},
-        {word:'whisper', explanation:'from Old English hwisprian — unrelated to Latin per-'},
-        {word:'hopper', explanation:'from Old English hoppre — not Latin per-'},
-        {word:'camper', explanation:'camp + -er agent suffix — not Latin per-'},
-        {word:'bumper', explanation:'from bump + -er — not Latin per-'},
-        {word:'expert', explanation:'from Latin expertus — -pert is not the productive prefix per-'},
-        {word:'rapper', explanation:'from rap + -er agent suffix — not Latin per-'},
-        {word:'jumper', explanation:'from jump + -er — not Latin per-'},
-        {word:'jasper', explanation:'proper noun/rock name — unrelated to Latin per-'},
-        {word:'temper', explanation:'from Latin temperare — root tem-, not prefix per-'},
-        {word:'supper', explanation:'from Old French souper — not Latin per-'},
-        {word:'whispering', explanation:'from Old English hwisprian — unrelated to Latin per-'},
-        {word:'imperial', explanation:'from Latin imperium — per is part of imper- root, not the prefix per-'},
-        {word:'operator', explanation:'from Latin operari "to work" — per not functioning as prefix'},
-        {word:'cooperate', explanation:'from Latin co- + operari "work" — not Latin per-'},
-        {word:'temperance', explanation:'same root as temper (tem-) — not Latin per-'},
-        {word:'periwig', explanation:'from French perruque — per- here is not Latin prefix'},
-        {word:'peridot', explanation:'from Arabic/different origin — per not a Latin prefix'},
-        {word:'perspective', explanation:'that is the word itself!'},
-      ],     
-     },
-    {name:'SPEC-',meaning:'to look, to see',origin:'Latin specere, "to look, to see"',
-     forms:['spec','spic','spy'],
-     words:[
-      ['inspect',2],
-      ['expect',2],
-      ['respect',2],
-      ['suspect',2],
-      ['aspect',2],
-      ['prospect',2],
-      ['speculate',2],
-      ['specimen',2],
-      ['species',2],
-      ['circumspect',2],
-      ['bishop',2,'from Greek episkopos, "overseer" — epi- (over) + skopos (watcher), from PIE *spek- (to observe) — a bishop is literally one who watches over the flock'],
-      ['despise',3,'from Latin de- (down, away) + specere (to look) — to despise is to look down on something, regarding it with contempt'],
-      ['despicable',3],
-      ['episcopal',3,'from Greek episkopos (overseer, bishop) — same PIE *spek- root, meaning one who watches over'],
-      ['especial',3],
-      ['scope',3],
-      ['skeptic',3,'from Greek skeptikos, "thoughtful, inquiring" — from skeptesthai (to look, consider), from PIE *spek- (to observe)'],
-      ['specious',2],
-      ['spectacular',2],
-      ['speculum',3,'a speculum is literally "a mirror" — something you look into, from Latin specere'],
-      ['spice',3,'from Latin species (appearance, kind) — spices were traded by "kind" or appearance; same root as species and specimen'],
-      ['suspicion',2],
-      ['suspicious',2],
-      ['inspection',1,'from Latin inspectare (to look at)'],
-      ['inspector',2],
-      ['introspect',2],
-      ['retrospect',2],
-      ['perspicacity',5],
-      ['perspicacious',3,'from Latin per + specere — to see clearly all the way through; both PER- and SPEC- at once'],
-      ['perspicuity',3,'from Latin per + specere — the quality of seeing through clearly; both PER- and SPEC- at once'],
-      ['spectrum',4,'from Latin spectrum, "appearance, image" — what you see when light is looked at through a prism'],
-      ['speculation',2],
-      ['spy',4,'from Old French espier, ultimately from a Germanic root related to Latin specere — to spy is to watch secretly'],
-      ['espy',4,'from Old French espier — to catch sight of something, the same root as spy and espionage'],
-      ['espionage',4,'from French espion, from the same Germanic-Latin root as spy — the organized practice of secret watching'],
-      ['scopophilia',4,'from Greek skopos (watcher) + philia (love) — PIE *spek- root — the compulsion to look'],
-      ['auspex',5,'from Latin avis (bird) + -spex (observer) — a priest who watched the flight of birds to read omens'],
-      ['auspices',5,'under the auspices of — literally "under the bird-watching of" — from auspex, the omen-reader'],
-      ['haruspex',5,'from Latin haru- (entrails) + -spex (observer) — a diviner who read omens in animal entrails; -spex is from specere'],
-      ['gyroscope',3,'from Greek gyros (circle) + skopos (watcher), from PIE *spek- — not Latin spec- but shares the same ancient root'],
-      ['telescope',2,'from Greek tele- (far) + skopos (watcher), from PIE *spek- — not Latin spec- but shares the same ancient root'],
-      ['horoscope',4,'from Greek hora (hour, season) + skopos (watcher), from PIE *spek- — a watcher of the hours; not Latin spec- but same root'],
-      ['conspicuous',4,'from Latin con- + specere (to look) — to be conspicuous is to attract the gaze completely, to be impossible not to look at'],
-      ['auspicious',5,'from Latin auspex, auspices — the root is avis (bird) + -pex (observer), from PIE *spek- — an auspicious event is one observed by favorable omens, originally by watching the flight of birds'],
-      ['frontispiece',5,'from Latin frontispicium, from frons (forehead) + specere (to look) — originally the facade of a building you face first; later the illustrated title page of a book'],
-     ],
-      exclude:[
-        {word:'respite', explanation:'"respite" likely traces through Old French respit — the connection to specere is disputed; best left aside'},
-        {word:'spin', explanation:'from Old English spinnan — not PIE *spek-'},
-        {word:'spider', explanation:'from Old English spīthra, "the spinner" — not PIE *spek-'},
-        {word:'spindle', explanation:'from Proto-Germanic *spannaz — not PIE *spek-'},
-        {word:'spinster', explanation:'agent noun from spinner + -ster — not PIE *spek-'},
-        {word:'spike', explanation:'from Germanic/Old Norse spika, "point" — not PIE *spek-'},
-        {word:'spine', explanation:'from Latin spina, "thorn, backbone" — unrelated to specere'},
-        {word:'spite', explanation:'from Middle Dutch spijt — unrelated to specere'},
-        {word:'spire', explanation:'from Old English spīr, "shoot, stalk" — unrelated to specere'},
-        {word:'spit', explanation:'from Old English spittan — unrelated to specere'},
-        {word:'spill', explanation:'from Old English spillan — unrelated to specere'},
-        {word:'spirit', explanation:'from Latin spīritus, "breath" — not PIE *spek-'},
-        {word:'spiral', explanation:'from Latin spira, "coil" — not PIE *spek-'},
-        {word:'inspire', explanation:'from Latin inspirare, "to breathe into" — not PIE *spek-'},
-        {word:'respire', explanation:'from Latin respirare, "to breathe" — not PIE *spek-'},
-        {word:'aspiration', explanation:'from Latin aspirare, "to breathe upon" — not PIE *spek-'},
-        {word:'spica', explanation:'Latin spīca, "ear of grain" — different root entirely'},
-        {word:'spicule', explanation:'from Latin spicula, "small spike" — not PIE *spek-'},
-        {word:'spiculate', explanation:'derived from spicule — unrelated to specere'},
-        {word:'hospice', explanation:'from Latin hospitium/hospes, "host/guest" — not PIE *spek-'},
-        {word:'hospital', explanation:'from Latin hospitalis — not PIE *spek-'},
-        {word:'hospitable', explanation:'from hospes/hospitium — unrelated to specere'},
-        {word:'aspirin', explanation:'from the plant name Spiraea — not PIE *spek-'},
-        {word:'aspic', explanation:'from French aspic — unrelated to specere'},
-        {word:'sphinx', explanation:'from Greek Sphinx — unrelated to PIE *spek-'},
-      ],      
-    },
-  ],
-  prompt:'PER- (through) + SPEC- (to look). To see clearly, you have to look all the way through.',
-},
-  
-  
-  {
-    id:6,
-    segments:[{text:'ABS',ri:0},{text:'TRACT',ri:1}],
-    roots:[
-      {name:'ABS-', meaning:'away from, off, apart', origin:'Latin ab/abs, "away from, off"',
- forms:['^ab','^abs'],
- words:[
-   ['absent',1],
-   ['absolute',1,'from Latin ab + solvere (to loosen) — loosened away from restriction; unconditional'],
-   ['absorb',1,'from Latin ab + sorbere (to suck in) — to suck something away into itself'],
-   ['absurd',2,'from Latin ab + surdus (deaf) — to be so far away from reason that you might as well be deaf to it'],
-   ['abuse',1,'from Latin ab + usus (use) — to use something away from its intended purpose, or to use it up completely'],
-   ['abrupt',1,'from Latin ab + ruptus (broken) — to break away suddenly'],
-   ['abnormal',1,'from Latin ab + normalis (conforming to a standard) — away from the norm'],
-   ['abolish',1],
-   ['abduct',1,'from Latin ab + ducere (to lead) — to lead someone away by force'],
-   ['abstain',2],
-   ['abbreviate',3,'from Latin ab + breviare (to shorten) — to cut away length, to condense'],
-   ['aberrant',3,'from Latin ab + errare (to wander) — wandering away from the expected path'],
-   ['abhor',2,'from Latin ab + horrere (to shudder) — to recoil away from something with dread'],
-   ['abject',3,'from Latin ab + jacere (to throw) — thrown away, cast down to the lowest state'],
-   ['abscond',2,'from Latin ab + condere (to hide) — to hide oneself away, usually after wrongdoing'],
-   ['abstinence',2],
-   ['abridge',2,'from Latin ab + breviare (to shorten) — to cut away, to make shorter; related to abbreviate'],
-   ['abjure',4,'from Latin ab + jurare (to swear) — to swear away from, to formally renounce'],
-   ['abdicate',4,'from Latin ab + dicare (to proclaim) — to formally proclaim oneself away from a role or throne'],
-   ['abdication',3,'from Latin ab + dicare — the formal act of proclaiming oneself away from a throne or office'],
-   ['abduction',1,'from Latin ab + ducere (to lead) — the act of leading someone away by force'],
-   ['absolve',2,'from Latin ab + solvere (to loosen) — to loosen away from blame or obligation'],
-   ['absolution',2,'from Latin ab + solvere — the formal loosening away from sin or guilt; forgiveness'],
-   ['abrade',2,'from Latin ab + radere (to scrape) — to scrape away a surface'],
-   ['abrasion',2,'from Latin ab + radere — the result of scraping away; a wound caused by friction'],
-   ['abrasive',2,'from Latin ab + radere — wearing away by scraping; also used figuratively of an irritating manner'],
-   ['abrogate',3,'from Latin ab + rogare (to ask, propose a law) — to ask away a law; to formally abolish it'],
-   ['abstruse',3,'from Latin ab + trudere (to push) — pushed away from easy understanding; hard to grasp'],
-   ['abstemious',3,'from Latin abs + temetum (strong drink) — abstaining away from alcohol; self-restrained'],
-   ['ablative',3,'from Latin ab + latus (carried) — the Latin case that carries meaning away from the noun; denoting removal or separation'],
-   ['abominate',3,'from Latin ab + omen — to turn away from as a bad omen; to detest'],
-   ['abominable',2,'from Latin ab + omen — worthy of being turned away from; detestable'],
-   ['abomination',2,'from Latin ab + omen — something so terrible it must be turned away from; a thing of horror'],
-   ['abscission',4,'from Latin ab + scindere (to cut) — a cutting away; used in botany for how leaves fall'],
-   ['absence',1,'from Latin ab + esse (to be) — the state of being away; not being present'],
-   ['abstention',3,'from Latin ab + tenere (to hold) — holding oneself away from voting or participating'],
-   ['abstinent',3,'from Latin ab + tenere — one who holds themselves away from indulgence'],
-   ['aberration',2,'from Latin ab + errare (to wander) — a wandering away from the normal; a deviation'],
-   ['abnegation',3,'from Latin ab + negare (to deny) — a denial away from oneself; self-renunciation'],
-   ['abnegate',4,'from Latin ab + negare — to formally deny or renounce; to abnegate responsibility'],
-   ['ablution',3,'from Latin ab + luere (to wash) — a washing away; ritual cleansing; a purifying wash'],
-   ['abort',2,'from Latin ab + oriri (to arise, be born) — a birth gone away; to fail to come into being'],
-   ['abortion',2,'from Latin ab + oriri — the going-away of a birth; a termination before completion'],
-   ['abound',2,'from Latin ab + undare (to rise in waves) — to overflow, to have waves flowing away in abundance'],
-   ['abscess',3,'from Latin ab + cedere (to go) — a going-away of humors into a swelling; a pocket of pus'],
-   ['avert',2,'from Latin ab + vertere (to turn) — to turn away; to ward off'],
-   ['averse',2,'from Latin ab + vertere — turned away in feeling; disinclined, reluctant'],
-   ['avocation',3,'from Latin ab + vocare (to call) — a calling away from one\'s main work; a hobby or secondary pursuit'],
-   ['inveigle',4,'from Vulgar Latin ab + oculus (eye) — to blind someone\'s judgment; to entice or persuade by flattery'],
-   ['abjuration',4,'from Latin ab + jurare — a solemn swearing-away; formal renunciation of a belief or allegiance'],
-   ['abruption',4,'from Latin ab + rumpere (to break) — a sudden breaking away; used in medicine and geology'],
-   ['abscissa',4,'from Latin ab + scindere (to cut) — the x-coordinate; literally "the line cut off" from the axis'],
-   ['abscise',4,'from Latin ab + caedere (to cut) — to cut away; used in botany for the shedding of leaves'],
-   ['abhorrence',2,'from Latin ab + horrere — a shuddering away; intense revulsion or loathing'],
-   ['abhorrent',2,'from Latin ab + horrere — inspiring a shuddering away; causing intense disgust'],
-   ['abductor',3,'from Latin ab + ducere — the muscle that pulls a limb away from the body; also one who abducts'],
-   ['aboriginal',3,'from Latin ab + origo (origin) — from the very origin; the original inhabitants of a place'],
-   ['aborigine',3,'from Latin ab + origo — an original inhabitant; one who was there from the beginning'],
-   ['ablactation',4,'from Latin ab + lactare (to suckle) — the weaning of an infant; the taking away of milk'],
-   ['ablegate',5,'from Latin ab + legare (to send as ambassador) — a papal envoy sent away on a mission; a representative dispatched from Rome'],
-   ['abaxial',5,'from Latin ab + axis — facing away from the axis; botanical term for the underside of a leaf'],
-   ['amanuensis',5,'from Latin a manu (from the hand) — a secretary who writes from dictation; one whose hand works away for another'],
-   ['ab initio',4,'Latin, "from the beginning" — literally "from the start, away from the initiation point"; used in law and science'],
-   ['a priori',4,'Latin, "from what comes first" — reasoning away from first principles to conclusions, before experience'],
-   ['a posteriori',4,'Latin, "from what comes after" — reasoning away from observed evidence back to causes; from experience'],
-   ['aseity',5,'from Latin a se (from oneself) — the philosophical property of existing independently, from oneself alone; used of God'],
-   ['asportation',5,'from Latin abs + portare (to carry) — a carrying away; the legal term for the removal of property in theft'],
-   ['advance',4,'from Late Latin abante (ab + ante, "from before") — to move from before; the ab- is buried but genuine'],
-   ['advantage',4,'from Late Latin abante — same root as advance; a position taken from before; a favorable head start'],
-   ['abdomen',2,'from Latin abdere (ab + dere, to put away) — the belly as "the concealer of the viscera"; the ab- connection is disputed but this puzzle follows Watkins\' hypothesis'],
-   ['abdominal',2,'from Latin abdomen — pertaining to the belly; same disputed but plausible ab- etymology as abdomen'],
- ],
- exclude:[
-   {word:'abandon', explanation:'"abandon" is from Old French à bandon ("at jurisdiction") — the ab is not the Latin prefix'},
-   {word:'about', explanation:'"about" is from Old English abutan — the ab is not the Latin prefix'},
-   {word:'above', explanation:'"above" is from Old English abufan — not the Latin prefix ab-'},
-   {word:'able', explanation:'"able" is from Latin habilis (handy) — unrelated to the prefix ab-'},
-   {word:'aboard', explanation:'"aboard" is from Old English — not the Latin prefix ab-'},
-   {word:'abode', explanation:'"abode" is from Old English abidan — not the Latin prefix ab-'},
-   {word:'abyss', explanation:'"abyss" is from Greek abyssos — the a- is Greek, not Latin ab-'},
-   {word:'abysmal', explanation:'"abysmal" is from Greek abyssos — the a- is Greek, not Latin ab-'},
-   {word:'abattoir', explanation:'"abattoir" is from French abattre, from Latin ad + battuere — the prefix here is ad- (toward), not ab- (away)'},
-   {word:'abreast', explanation:'"abreast" is from Old English a + breast — the a- is Old English, not Latin ab-'},
-   {word:'abase', explanation:'"abase" is from Old French a + baissier (to lower) — the a- here is French, not Latin ab-'},
-   {word:'abash', explanation:'"abash" is from Old French esbahir — unrelated to Latin ab-'},
-   {word:'abate', explanation:'"abate" is from Old French abatre, from Latin ad + battuere — the prefix is ad- (toward), not ab- (away); same root as abattoir'},
-   {word:'abeyance', explanation:'"abeyance" is from Old French abeance (aspiration) — unrelated to Latin ab-'},
-   {word:'abet', explanation:'"abet" is from Old French a + beter (to bait) — the a- is French, not Latin ab-'},
-   {word:'abide', explanation:'"abide" is from Old English abidan — not the Latin prefix ab-'},
-   {word:'ablaze', explanation:'"ablaze" is from Old English a + blaze — the a- is Old English, not Latin ab-'},
-   {word:'ablaut', explanation:'"ablaut" is from German — unrelated to Latin ab-'},
-   {word:'abiotic', explanation:'"abiotic" is from Greek a- (not) + bios (life) — the a- is Greek, not Latin ab-'},
-   {word:'abiogenesis', explanation:'"abiogenesis" is from Greek a- (not) + bios (life) — the a- is Greek, not Latin ab-'},
- ],
-},
-      {name:'TRACT-', meaning:'to drag, draw, pull', origin:'Latin trahere / tractum, "to drag, pull"',
- forms:['tract','trail','treat','trait','train'],
- formExclude:['strain'],
- words:[
-   ['attract',1],
-   ['contract',1],
-   ['distract',1],
-   ['extract',1],
-   ['retract',2],
-   ['subtract',1],
-   ['tractor',1,'from Latin tractor (one who drags) — a vehicle for pulling things'],
-   ['traction',2,'from Latin tractio, from trahere — the act of pulling; the grip of a tire on the road'],
-   ['trace',2,'from Latin tractiare, frequentative of trahere — to draw a line, to follow a pulled path'],
-   ['treat',1,'from Old French traitier, from Latin tractare (to handle, manage) — a frequentative of trahere'],
-   ['treatment',1,'from Latin tractare — how something is handled or managed; medical treatment is literally "the handling of a patient"'],
-   ['mistreat',1,'from mis- + tractare — to handle badly or wrongly'],
-   ['retreat',2,'from Old French retraite, from Latin retrahere — to pull back, to draw away again'],
-   ['trait',2,'from French trait, from Latin tractus — something drawn out; originally a stroke of a pen, then a feature of character'],
-   ['treaty',2,'from Old French traité, from Latin tractatus — something handled or drawn up between parties'],
-   ['entreat',2,'from Old French en + traitier — to plead earnestly; to pull someone toward your cause with appeals'],
-   ['maltreat',2],
-   ['portrait',3,'from Old French portraire, from Latin protrahere (to draw forth) — to draw out the likeness of someone'],
-   ['portray',3,'from Old French portraire — same root as portrait; to draw forth a representation'],
-   ['protract',3,'from Latin pro + trahere — to draw forward in time; to prolong'],
-   ['detract',3,'from Latin de + trahere — to draw away from; to diminish'],
-   ['contractor',2,'from Latin contractor, from contrahere — one who draws up an agreement to do work'],
-   ['tractable',4,'from Latin tractabilis — able to be handled or drawn; manageable'],
-   ['intractable',3,'from Latin in + tractabilis — not able to be handled; stubbornly resistant'],
-   ['distraught',3,'an alteration of distract, from Latin distrahere (to pull in different directions) — the -ght ending came by analogy with words like caught and taught'],
-   ['distrait',4,'from French, from Latin distrahere — quietly pulled in different directions; absent-minded with worry; a more refined cousin of distraught'],
-   ['trail',2,'from Old French trailler, from Latin tragulare (to drag a net) — to drag behind; what is left when something is pulled through'],
-   ['entrails',3,'from Old French entrailles, from Latin interanea — the parts dragged inward; the interior organs'],
-   ['extractor',3,'from Latin extractor, from extrahere (to pull out) — a tool or device for pulling something out'],
-   ['train',3,'from Old French trainer, from Latin trahere — originally "that which is dragged behind"; a train of a gown, then a procession, then a locomotive pulling cars behind it'],
-   ['treatise',3,'from Anglo-French tretiz, from Latin tractatus — a written work that thoroughly handles a subject; something drawn up in writing'],
-   ['detractor',3,'from Latin detractor, from detrahere — one who pulls down another\'s reputation'],
-   ['detraction',3,'from Latin detractionem, from detrahere — the act of pulling down someone\'s reputation; disparagement'],
-   ['retraction',3,'from Latin retractionem — a pulling back; formally withdrawing a statement or published claim'],
-   ['tractile',4,'from Latin trahere — capable of being drawn out or stretched; ductile'],
-   ['trawl',3,'from Dutch tragelen, from Latin tragula (dragnet) — to drag a net through water; the same root as trahere pulled through a different language'],
-   ['tractor beam',4,'science fiction term for a beam that pulls objects through space — a playful extension of tractor, which itself is from trahere'],
-   ['tractate',4,'from Latin tractatus, from tractare — a formal written treatise; a drawn-up document on a specific subject'],
-   ['trattoria',4,'from Italian trattare, from Latin tractare — an Italian restaurant; literally a place of treating or handling guests'],
-   ['protraction',4,'from Latin protrahere — the act of drawing something out or prolonging it; used in geometry and diplomacy'],
-   ['contractile',3,'from Latin contrahere — capable of contracting or drawing together; used of muscles and cells'],
-   ['tractive',4,'from Latin trahere — having the power to pull or draw; used of locomotive force'],
-   ['tractarian',4,'from tract + -arian — a follower of the Oxford Movement, named for their theological tracts; a High Church Anglican'],
-   ['contractarian',5,'from contract + -arian — one who grounds political theory in social contract; Hobbes, Locke, and Rousseau were contractarians'],
-   ['contractarianism',5,'from contract + -arianism — the political philosophy that social obligations derive from a social contract; the theory behind Hobbes\' Leviathan'],
-   ['contractual',2,'from Latin contractualis, from contractus — relating to or bound by a contract; something drawn up between parties'],
-   ['contractualism',5,'from contractual + -ism — the ethical theory that moral rules derive from agreements we would make under ideal conditions'],
-   ['tractation',5,'from Latin tractatio, from tractare — the action of treating or discussing a subject in writing; so rare it almost needs to be rediscovered'],
- ],
- exclude:[
-   {word:'drag', explanation:'"drag" is from Old Norse/Old English — Germanic root, possibly related to trahere but the connection is disputed'},
-   {word:'draw', explanation:'"draw" is from Old English dragan — Germanic root, possibly related to trahere but the connection is disputed'},
-   {word:'street', explanation:'"street" ends in -treet, not from trahere — from Latin strata (paved road)'},
-   {word:'threat', explanation:'"threat" is from Old English thrēat — unrelated to trahere'},
-   {word:'strait', explanation:'"strait" is from Latin strictus (bound tight, from stringere) — not trahere; a different root entirely'},
-   {word:'straiten', explanation:'"straiten" is from strait, from Latin strictus — not trahere'},
-   {word:'traitor', explanation:'"traitor" looks like trait but comes from Latin tradere (to hand over, betray) — not trahere; a classic false friend'},
- ],
-},
 
-    ],
-    prompt:'ABS- (away) + TRACT- (pull). Something pulled apart or drawn away that needs a name?',
-  },
-  {
-    id:7,
-    segments:[{text:'IN',ri:0},{text:'FORM',ri:1},{text:'ATION',ri:-1}],
-    roots:[
-      {name:'IN-',meaning:'into, onto, upon',origin:'Latin in, "into, upon"; assimilates to il-, im-, ir-',
-       forms:['^in','^il','^im','^ir'],
-       words:[['include',1],['inject',1],['insert',1],['inspect',1],['install',1],['intend',1],['invest',1],['invite',1],['involve',1],['impose',1],['imprint',1],['impulse',2],['illuminate',1],['illustrate',1],['irrigate',2],['inflict',2],['inflate',1],['infuse',2],['ingress',3],['impel',3],['imbue',3],['immerse',2],['invoke',2],['impart',2]]},
-      {name:'FORM-',meaning:'shape, figure, structure',origin:'Latin forma, "shape, figure, mold"',
-       forms:['form'],
-       words:[['form',1],['format',1],['formal',1],['formula',1],['reform',1],['transform',1],['uniform',1],['conform',1],['perform',1],['deform',2],['inform',1],['platform',1],['formation',1],['formulate',2],['formidable',2],['informal',1],['uniformity',2],['malformed',2],['cuneiform',3],['conformist',2]]},
-    ],
-    prompt:'IN- (into) + FORM- (shape). What gets shaped or poured into a form?',
-  },
-  {
-    id:8,
-    segments:[{text:'CO',ri:0},{text:'HER',ri:1},{text:'ENT',ri:-1}],
-    roots:[
-      {name:'CO-',meaning:'together, jointly, with',origin:'Latin com/con, "with, together"; shortened to co- before vowels and h',
-       forms:['^co','^col','^com','^con','^cor'],
-       words:[['cohere',2],['cohesion',2],['coexist',2],['cooperate',1],['coordinate',1],['coalition',2],['coalesce',2],['coincide',1],['collaborate',1],['collect',1],['colleague',1],['combine',1],['communicate',1],['community',1],['connect',1],['construct',1],['contain',1],['contribute',1],['convince',1],['correspond',1],['correct',1],['correlate',2],['corrupt',2],['cognate',3],['colloquial',3]]},
-      {name:'HAER-',meaning:'to stick, cling, adhere',origin:'Latin haerere, "to stick, cling, be attached"',
-       forms:['adher','coher','inher','hesit','adhes','cohes'],
-       words:[['adhere',2],['adhesive',1],['adhesion',2],['cohere',2],['coherent',1],['coherence',2],['incoherent',1],['inherent',1],['inhere',3],['hesitate',1],['hesitation',1],['hesitant',2],['cohesion',2],['cohesive',2],['inherently',2]]},
-    ],
-    prompt:'CO- (together) + HAER- (stick). What sticks and/or is together but has no word yet?',
-  },
-  {
-    id:9,
-    segments:[{text:'ART',ri:0},{text:'I',ri:-1},{text:'FIC',ri:1},{text:'IAL',ri:-1}],
-    roots:[
-      {name:'ART-',meaning:'skill, craft, technique',origin:'Latin ars / artis, "skill, craft, method"',
-       forms:['^art'],
-       words:[['art',1],['artist',1],['artisan',2],['artifact',1],['artistry',2],['artistic',1],['artful',2],['artless',2],['artwork',1],['inert',2],['inertia',2],['artefact',2],['artifice',2]]},
-      {name:'FIC-',meaning:'to make, do, produce',origin:'Latin facere / fic-, "to make, do"',
-       forms:['fic','fact','fect','feas','fy$'],
-       words:[['affect',1],['effect',1],['defect',1],['infect',1],['perfect',1],['fact',1],['factor',1],['factory',1],['manufacture',1],['beneficial',2],['terrific',1],['specific',1],['scientific',1],['prolific',2],['magnificent',2],['pacific',2],['proficient',2],['sufficient',1],['efficient',1],['feasible',2],['feat',2],['feature',1],['satisfy',1],['certify',1],['justify',1],['terrify',1],['clarify',1],['verify',1],['pacify',1]]},
-    ],
-    prompt:'ART- (skill) + FIC- (make). What skillful and/or made thing still lacks a name?',
-  },
-  {
-    id:10,
-    segments:[{text:'CO',ri:0},{text:'AL',ri:1},{text:'ESCE',ri:-1}],
-    roots:[
-      {name:'CO-',meaning:'together, jointly, with',origin:'Latin com/con, "with, together"; shortened to co- before vowels and h',
-       forms:['^co','^col','^com','^con','^cor'],
-       words:[['cohere',2],['cohesion',2],['coexist',2],['cooperate',1],['coordinate',1],['coalition',2],['coincide',1],['collaborate',1],['collect',1],['colleague',1],['combine',1],['communicate',1],['community',1],['connect',1],['construct',1],['contain',1],['contribute',1],['convince',1],['correspond',1],['correct',1],['correlate',2],['corrupt',2]]},
-      {name:'AL-',meaning:'to nourish, cause to grow',origin:'Latin alere, "to nourish, feed, sustain"',
-       forms:['alesc','aliment','alumn','alma'],
-       words:[['alumni',2],['alumnus',2],['aliment',3],['alimentary',3],['alma',2],['coalesce',2],['coalescent',3],['coalition',2],['adolescent',2],['adult',2]]},
-    ],
-    prompt:'CO- (together) + AL- (nourish/grow). Did these roots make you think of a word that REALLY needs to exist? Share it here.',
-  },
-  {
-    id:11,
-    segments:[{text:'SYN',ri:0},{text:'THE',ri:1},{text:'SIS',ri:2}],
-    roots:[
-      {name:'SYN-',meaning:'together, with, at the same time',origin:'Greek syn, "together"',
-       // syn- assimilates to sym- before b/m/p, syl- before l, sys- before s
-       forms:['^syn','^sym','^syl','^sys'],
-       words:[['sync',1],['synergy',2],['syntax',2],['syndrome',1],['synonym',1],['synchronize',2],['symphony',1],['sympathy',1],['symbol',1],['symbiosis',2],['symmetry',1],['synthetic',1],['synapse',2],['syncopate',3],['symbiotic',2],['symbolic',1]]},
-      {name:'THES-',meaning:'to place, put, set down',origin:'Greek tithenai, "to place"',
-       // thes- (thesis, thesaurus), thet- (synthetic, epithet), them- (theme, anathema)
-       forms:['thes','thet','them'],
-       words:[['thesis',1],['antithesis',2],['hypothesis',1],['parenthesis',2],['prosthesis',2],['epithet',3],['theme',1],['thematic',1],['thesaurus',2],['synthetic',1],['anathema',3],['apothecary',3]]},
-      {name:'-SIS',meaning:'act of, process, condition',origin:'Greek noun suffix',
-       forms:['sis$'],
-       words:[['analysis',1],['basis',1],['crisis',1],['diagnosis',1],['emphasis',1],['genesis',1],['hypothesis',1],['metamorphosis',2],['paralysis',2],['thesis',1],['ellipsis',2],['axis',1],['osmosis',2],['stasis',2],['catharsis',3],['mimesis',3],['praxis',3],['diegesis',3]]},
-    ],
-    prompt:'SYN (together) + THES (place) + SIS (process). Did these roots make you think of a word that REALLY needs to exist? Share it here.',
-  },
-{
-    id:12,
-    segments:[{text:'TELE',ri:0},{text:'SCOPE',ri:1}],
-    roots:[
-      {name:'TELE-',meaning:'far off, at a distance',origin:'Greek tele, "far"',
-       forms:['^tele'],
-       words:[['telephone',1],['telegraph',1],['television',1],['telepathy',1],['telegram',1],['teleport',1],['telecast',1],['telekinesis',2],['telemetry',3],['telephoto',2],['teleconference',1],['telemarketing',1]]},
-      {name:'-SCOPE',meaning:'to look at, examine, observe',origin:'Greek skopein, "to look"',
-       forms:['scope$'],
-       words:[['microscope',1],['horoscope',1],['periscope',2],['kaleidoscope',2],['stethoscope',2],['gyroscope',2],['endoscope',2],['spectroscope',3],['oscilloscope',3],['scope',1]]},
-    ],
-    prompt:'TELE- (far) + SCOPE (look). Did these roots make you think of a word that REALLY needs to exist? Share it here.',
-  },
-{
-    id:13,
-    segments:[{text:'LUMEN',ri:0},{text:'ESCENT',ri:1}],
-    roots:[
-      {name:'LUMIN-',meaning:'light, to shine',origin:'Latin lumen "light", lux, lucere',
-       // lumin- (luminous), luc- (lucid, translucent), lux (the word itself), lun- (luna, lunar)
-       forms:['lumin','luc','lux$','^lun'],
-       words:[['luminous',1],['illuminate',1],['luminary',2],['translucent',2],['lucid',2],['elucidate',3],['lux',2],['luna',1],['lunar',1],['lunatic',1],['luster',1],['illustrate',1],['luminosity',2],['bioluminescent',3],['pellucid',3],['lucent',3]]},
-      {name:'-ESCENT',meaning:'becoming, in the process of',origin:'Latin -escere, inceptive suffix',
-       forms:['escent$'],
-       words:[['fluorescent',1],['phosphorescent',2],['adolescent',1],['convalescent',2],['obsolescent',3],['iridescent',2],['opalescent',3],['effervescent',2],['quiescent',3],['evanescent',3],['incandescent',2],['pearlescent',2],['tumescent',3],['senescent',3]]},
-    ],
-    prompt:'LUMIN (light) + ESCENT (becoming). Did these roots make you think of a word that REALLY needs to exist? Share it here.',
-  },
-];
+// ── POTENTIAL FUTURE WORDS ───────────────────────────────────────
+// Words to build out and add to the queue when ready:
+//   COALESCE      (CO + AL — Latin: together + nourish/grow)
+//   SUSPEND       (SUB + PEND — Latin: under + hang)
+//   EPHEMERAL     (EPI + HEMERA — Greek: on + day)
+//   METAMORPHOSIS (META + MORPH — Greek: change + form)
+//   PHILANTHROPY  (PHIL + ANTHROP — Greek: love + human)
+//   PHILOSOPHY    (PHIL + SOPHIA — Greek: love + wisdom)
+//   CATASTROPHE   (KATA + STROPH — Greek: down + turn)
+//   VERBOSE       (VERB + OSE — Latin: word + full of)
+//   TRANSFORM     (TRANS + FORM)
+// ─────────────────────────────────────────────────────────────────
+
 
 // ── DAILY (midnight EST/EDT rollover) ────────────────────────────
 const LAUNCH = '2026-03-09'; // Day 1 = Monday March 9
@@ -1232,7 +657,8 @@ function stemWord(w) {
     [/izations?$/, 'ize'],  [/ising$/, 'ise'],   [/isation$/, 'ise'],
     [/nesses$/, ''],         [/ness$/, ''],
     [/ments$/, ''],          [/ment$/, ''],
-    [/ations?$/, 'ate'],     [/tions?$/, 'te'],    [/ions?$/, 'e'],
+    [/ities$/, 'e'],         [/ity$/, 'e'],
+    [/ations?$/, 'ate'],     [/ions?$/, ''],       [/tions?$/, 'te'],
     [/izers?$/, 'ize'],      [/isers?$/, 'ise'],
     [/izing$/, 'ize'],       [/ising$/, 'ise'],
     [/ily$/, 'y'],           [/ly$/, ''],
@@ -1247,13 +673,16 @@ function stemWord(w) {
     [/([a-z])\1ed$/, '$1'],  [/ed$/, ''],
     [/s$/, ''],
   ];
+  // Strip trailing 'e' for normalization — so "absolute" and "absolut" (from absolution)
+  // both collapse to "absolut", and "active" / "activity" both collapse to "activ".
+  const norm = s => (s.endsWith('e') && s.length > 3) ? s.slice(0, -1) : s;
   for (const [pat, rep] of rules) {
     if (pat.test(w)) {
       const stem = w.replace(pat, rep);
-      if (stem.length >= 3) return stem;
+      if (stem.length >= 3) return norm(stem);
     }
   }
-  return w;
+  return norm(w);
 }
 
 // Returns all root indices whose morpheme forms match this word (may be multiple).
@@ -1675,6 +1104,27 @@ function restoreCoined() {
   if(voted){}
 }
 
+// ── COMMUNITY STATS ──────────────────────────────────────────────
+async function loadCommunityStats() {
+  const el = document.getElementById('community-stats');
+  if (!el) return;
+  try {
+    const res = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vRe-cfkouRw38V0FbHlwGxLDG-Od3IwDTl7nb4kqj_O-HXUCpcVcomyUk0LOAPSCgZF34qRRFvYTmZd/pub?gid=937350218&single=true&output=csv');
+    const text = await res.text();
+    const rows = text.trim().split('\n').slice(1); // skip header
+    const todayRow = rows.find(r => r.split(',')[0].trim() === String(puzzleDay));
+    if (!todayRow) return; // no data yet for this puzzle, show nothing
+    const cols = todayRow.split(',');
+    const topScore = cols[1]?.trim();
+    const avg = cols[3]?.trim();
+    if (!topScore || topScore === '0') return; // puzzle hasn't been played yet
+    const avgDisplay = avg && avg !== '' && avg !== '#DIV/0!' ? ` · avg: ${Math.round(parseFloat(avg))}` : '';
+    el.textContent = `today's best: ${topScore} pts${avgDisplay}`;
+  } catch(e) {
+    // fail silently — stats are a nice-to-have, never block the game
+  }
+}
+
 init();
 // Show hints for undiscovered roots on load
 today.roots.forEach((_,i)=>{
@@ -1682,6 +1132,7 @@ today.roots.forEach((_,i)=>{
   else showHint(i,false);
 });
 updateStats();
+loadCommunityStats();
 
 // ── HELP MODAL ────────────────────────────────────────────────────
 function openHelp() {

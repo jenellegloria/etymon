@@ -325,140 +325,9 @@
   <a href="index.html">Etymon</a> · A daily etymology game · <a href="index.html">Play today</a>
 </footer>
 
+<script src="puzzles.js"></script>
+<script src="submissions.js"></script>
 <script>
-// ─────────────────────────────────────────────────────────────────
-// ARCHIVE DATA
-// To update: paste a new entry object at the TOP of this array.
-// Each entry added after the day ends — include the best coined words
-// from that day's Formspree submissions.
-//
-// TEMPLATE (copy this, fill it in, paste at top of array):
-//
-// {
-//   id: 4,                          // puzzle number
-//   date: "March 9, 2026",          // display date
-//   word: "TELESCOPE",              // the target word
-//   roots: [
-//     { name: "TELE-", meaning: "far off, at a distance", color: 0 },
-//     { name: "-SCOPE", meaning: "to look at, observe", color: 1 },
-//   ],
-//   coins: [
-//     { word: "teleblind", def: "the inability to see what is right in front of you", author: "anonymous" },
-//   ],
-// },
-//
-// ─────────────────────────────────────────────────────────────────
-
-const ARCHIVE = [
-
-  // ↓↓↓ PASTE NEW ENTRIES AT THE TOP ↓↓↓
-{
-    id: 5,
-    date: "March 13, 2026",
-    word: "PERSPECTIVE",
-    segments: [
-      { text: "PER", ri: 0 },
-      { text: "SPEC", ri: 1 },
-      { text: "TIVE", ri: -1 },
-    ],
-    roots: [
-      { name: "PER-", meaning: "through, thoroughly, completely", color: 0 },
-      { name: "SPEC-", meaning: "to look, to see", color: 1 },
-    ],
-    topScore: 110,
-    mostWords: 100,
-    coins: [
-      { word: "Perspeculation", def: "Being able to see the possible outcomes of something", author: "anonymous" },
-      { word: "Comperspectant", def: "Seeing things the same way; sharing a viewpoint", author: "Gammarad" },
-    ],
-  },
-{
-    id: 4,
-    date: "March 12, 2026",
-    word: "RECOMPENSE",
-    segments: [
-      { text: "RE", ri: 0 },
-      { text: "COM", ri: 1 },
-      { text: "PENS", ri: 2 },
-      { text: "E", ri: -1 },
-    ],
-    roots: [
-      { name: "RE-", meaning: "back, again", color: 0 },
-      { name: "COM-", meaning: "together, with", color: 1 },
-      { name: "PENS-", meaning: "to hang, weigh, pay", color: 2 },
-    ],
-    topScore: 83,
-    mostWords: 166,
-    coins: [
-      { word: "recompensieve", def: "to ponder the things we owe each other" },
-    ],
-  },
-{
-    id: 3,
-    date: "March 11, 2026",
-    word: "ARTIFICIAL",
-    segments: [
-      { text: "ART", ri: 4 },
-      { text: "I", ri: -1 },
-      { text: "FIC", ri: 0 },
-      { text: "IAL", ri: 0 },
-    ],
-    roots: [
-      { name: "ART-", meaning: "skill, craft, art", color: 2 },
-      { name: "-FIC-", meaning: "to make, do (from Latin *facere*)", color: 3 },
-    ],
-    topScore: 153,
-
-    coins: [
-      { word: "artifictitious", def: "Something made by a fictional character" },
-      { word: "artefactual", def: "A fact that has since been disproven by science" },
-      { word: "farticle", def: "a poorly written article"},
-      { word: "defarticial", def: "something that is really really unpleasantly artificial" },
-      { word: "artstruct", def: "the skillful rearrangement of parts into a structure", author: "anonymous" }
-    ],
-  },
-{
-    id: 2,
-    date: "March 10, 2026",
-    word: "CORPUSCLE",
-    segments: [
-      { text: "CORPUS", ri: 2 },
-      { text: "CLE", ri: 3 },
-    ],
-    roots: [
-      { name: "CORPUS-", meaning: "body", color: 2 },
-      { name: "-CLE", meaning: "little", color: 3 },
-    ],
-    topScore: 54,
-
-    coins: [
-      { word: "corpsacle", def: "a debacle involving lots of dead bodies", author: "anonymous" }
-    ],
-  },
-  {
-    id: 1,
-    date: "March 9, 2026",
-    word: "OBFUSCATE",
-    segments: [
-      { text: "OB", ri: 0 },
-      { text: "FUSC", ri: 1 },
-      { text: "ATE", ri: -1 },
-    ],
-    roots: [
-      { name: "OB-", meaning: "against, toward, in the way of", color: 0 },
-      { name: "FUSC-", meaning: "to darken, make dusky", color: 1 },
-    ],
-    topScore: 82,
-    note: "Note: the version live on Day 1 incorrectly listed FUS- (to pour, from Latin fundere) as a root. FUSC- (dark, from Latin fuscus) and FUS- are unrelated — they just look alike. The archive reflects the corrected etymology.",
-    coins: [
-      { word: "obfuscnym", def: "a name that blocks understanding of the thing it's naming", author: "anonymous" }
-    ],
-  },
-
-  // ↑↑↑ PASTE NEW ENTRIES AT THE TOP ↑↑↑
-
-];
-
 // ─────────────────────────────────────────────────────────────────
 // COLORS (don't need to edit this)
 const COLORS = [
@@ -469,11 +338,18 @@ const COLORS = [
   { cls: 'r4', hex: '#DB2777', pale: '#FCE7F3' },
 ];
 
-function renderWord(entry) {
-  if (!entry.segments || !entry.segments.length) return entry.word;
-  return entry.segments.map(seg => {
+// Launch date — Day 1 = March 9, 2026
+const LAUNCH = new Date('2026-03-09T00:00:00');
+
+function getPuzzleDate(id) {
+  const d = new Date(LAUNCH);
+  d.setDate(d.getDate() + (id - 1));
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+function renderWord(puzzle) {
+  return puzzle.segments.map(seg => {
     if (seg.ri === -1) return `<span class="seg-gray">${seg.text}</span>`;
-    const c = COLORS[entry.roots[seg.ri] ? entry.roots.findIndex((_,i) => i === seg.ri) : 0];
     const color = (COLORS[seg.ri] || COLORS[0]).hex;
     return `<span class="seg-root" style="color:${color}">${seg.text}</span>`;
   }).join('');
@@ -482,19 +358,27 @@ function renderWord(entry) {
 function render() {
   const container = document.getElementById('archive');
 
-  if (!ARCHIVE.length) {
+  // Sort submissions newest first
+  const sortedSubs = [...SUBMISSIONS].sort((a, b) => b.id - a.id);
+
+  if (!sortedSubs.length) {
     container.innerHTML = '<div class="empty-state"><p>No past puzzles yet. Check back tomorrow.</p></div>';
     return;
   }
 
-  ARCHIVE.forEach((entry, idx) => {
+  sortedSubs.forEach((sub, idx) => {
+    const puzzle = WORDS.find(w => w.id === sub.id);
+    if (!puzzle) return;
+
     const el = document.createElement('div');
     el.className = 'puzzle-entry';
     el.style.animationDelay = `${idx * 0.06}s`;
 
-    // Root pills HTML
-    const rootsHTML = entry.roots.map(r => {
-      const c = COLORS[r.color] || COLORS[0];
+    const date = getPuzzleDate(sub.id);
+
+    // Root pills HTML — color by root index
+    const rootsHTML = puzzle.roots.map((r, i) => {
+      const c = COLORS[i] || COLORS[0];
       return `<span class="entry-root" style="background:${c.pale};color:${c.hex};border-color:${c.hex}">
         <span class="entry-root-name">${r.name}</span>
         ${r.meaning ? `<span class="entry-root-meaning">${r.meaning}</span>` : ''}
@@ -503,8 +387,8 @@ function render() {
 
     // Coined words HTML
     let coinedHTML = '';
-    if (entry.coins && entry.coins.length > 0) {
-      const items = entry.coins.map(c => `
+    if (sub.coins && sub.coins.length > 0) {
+      const items = sub.coins.map(c => `
         <div class="coined-item">
           <span class="coined-word">${c.word}</span>
           <span class="coined-def">${c.def}</span>
@@ -517,24 +401,25 @@ function render() {
     }
 
     // Stats HTML
-	let statsHTML = '';
-	if (entry.topScore != null || entry.mostWords != null) {
+    let statsHTML = '';
+    if (sub.topScore != null || sub.mostWords != null) {
       const parts = [];
-      if (entry.topScore != null) parts.push(`<div class="estat"><span>${entry.topScore}</span>high score</div>`);
-      if (entry.mostWords != null) parts.push(`<div class="estat"><span>${entry.mostWords}</span>most words found</div>`);
-  	  statsHTML = `<div class="entry-stats">${parts.join('')}</div>`;
-	}
-    const noteHTML = entry.note
-      ? `<div class="entry-note">${entry.note}</div>`
+      if (sub.topScore != null) parts.push(`<div class="estat"><span>${sub.topScore}</span>high score</div>`);
+      if (sub.mostWords != null) parts.push(`<div class="estat"><span>${sub.mostWords}</span>most words found</div>`);
+      statsHTML = `<div class="entry-stats">${parts.join('')}</div>`;
+    }
+
+    const noteHTML = sub.note
+      ? `<div class="entry-note">${sub.note}</div>`
       : '';
 
     el.innerHTML = `
       <div class="entry-num">
-        <div class="num-big">${entry.id}</div>
-        <span class="num-date">${entry.date}</span>
+        <div class="num-big">${sub.id}</div>
+        <span class="num-date">${date}</span>
       </div>
       <div class="entry-body">
-        <div class="entry-word">${renderWord(entry)}</div>
+        <div class="entry-word">${renderWord(puzzle)}</div>
         <div class="entry-roots">${rootsHTML}</div>
         ${coinedHTML}
         ${statsHTML}
