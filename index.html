@@ -178,12 +178,7 @@
   .coined-card{display:none;margin-top:.8rem;padding:.8rem;background:var(--bg);border-radius:7px;border:1px solid var(--border);}
   .coined-card.show{display:block;}
   .coined-word{font-family:'Instrument Serif',serif;font-size:1.25rem;font-style:italic;margin-bottom:.15rem;}
-  .coined-def{font-size:.82rem;color:var(--ink-mid);line-height:1.5;margin-bottom:.55rem;}
-  .vote-row{display:flex;align-items:center;gap:.65rem;}
-  .vote-btn{font-family:'DM Sans',sans-serif;font-size:.72rem;padding:.25rem .65rem;border-radius:20px;border:1.5px solid var(--border);background:white;color:var(--ink-mid);cursor:pointer;transition:all .15s;}
-  .vote-btn:hover{border-color:var(--ink);color:var(--ink);}
-  .vote-btn.voted{background:var(--ink);color:white;border-color:var(--ink);}
-  .vote-note{font-size:.7rem;color:var(--ink-light);font-style:italic;}
+  .coined-def{font-size:.82rem;color:var(--ink-mid);line-height:1.5;}
 
   /* Results breakdown */
   .res-bd{width:100%;max-width:400px;}
@@ -225,9 +220,10 @@
   <div style="background:#FFFEF9;border-radius:14px;width:100%;max-width:420px;padding:1.8rem 1.8rem 1.5rem;position:relative;">
     <button id="help-close" style="position:absolute;top:.9rem;right:1rem;background:none;border:none;font-size:1.1rem;color:var(--ink-light);cursor:pointer;">✕</button>
     <div style="font-size:.65rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-light);margin-bottom:.5rem;">How to play</div>
-    <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:var(--ink);margin-bottom:1.2rem;line-height:1.2;">Every word has roots.<br>Find them.</div>
+    <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:var(--ink);margin-bottom:.7rem;line-height:1.2;">Every word has roots.<br>Find them.</div>
+    <div style="font-size:.88rem;color:var(--ink-mid);margin-bottom:1.2rem;line-height:1.6;">To play, type any word that feels like it has a shared history with the target word. You score points by finding <em>more</em> words with a shared root, especially <em>rare</em> ones. Good luck!</div>
     <div style="display:flex;flex-direction:column;gap:.85rem;font-size:.84rem;color:var(--ink-mid);line-height:1.6;">
-      <div><strong style="color:var(--ink);">The target word</strong> is shown broken into colored segments — each color is a root to discover.</div>
+      <div><strong style="color:var(--ink);">The target word</strong> is broken into segments — type words to light them up and discover what each root means.</div>
       <div><strong style="color:var(--ink);">Type any word</strong> you think shares a root. If it does, that root lights up and you score points.</div>
       <div><strong style="color:var(--ink);">Gray segments</strong> are connective tissue — Latin glue that holds the word together. Not scored, just shown for clarity.</div>
       <div><strong style="color:var(--ink);">Reveal a root</strong> if you're stuck — but finding it yourself first earns a <strong>+3 bonus</strong>. 🌟</div>
@@ -311,10 +307,6 @@
     <div class="coined-card" id="coined-card">
       <div class="coined-word" id="coined-word"></div>
       <div class="coined-def" id="coined-def"></div>
-      <div class="vote-row">
-        <button class="vote-btn" id="vote-btn">👍 Should be real</button>
-        <span class="vote-note" id="vote-note"></span>
-      </div>
     </div>
   </div>
 
@@ -528,6 +520,9 @@ const WORDS = [
        ['permeate',2,'from Latin per + meare (to pass through) — to permeate is to pass through something, often with the sense of spreading or saturating'],
        ['perplex',2,'from Latin per + plexus (entwined) — to perplex is to entangle someone\'s thoughts thoroughly, leaving them confused'],
        ['persevere',2,'from Latin per + severus (strict, serious) — to persevere is to hold strictly through difficulties without giving up'],
+       ['imperfect',2,'from Latin in + per + facere — not thoroughly made; the per- is the same root as in perfect'],
+       ['imperfection',2,'from Latin in + per + facere — the state of not being thoroughly made'],
+       ['perfume',2,'from Latin per + fumare (to smoke) — to perfume is to send smoke or scent thoroughly through a space'],
        ['perennial',3,'from Latin per + annus (year) — something perennial lasts through the years, enduring or recurring regularly'],
        ['perturb',3,'from Latin per + turbare (to disturb)'],
        ['pervasive',3,'from Latin per + vas (vessel) — to be pervasive is to spread through like a liquid filling a vessel, thoroughly'],
@@ -535,7 +530,10 @@ const WORDS = [
        ['perfunctory',3,'from Latin per + fungi (to perform) — something perfunctory is done thoroughly but without care or interest, as if just going through the motions'],
        ['percolate',3,'from Latin per + colare (to strain) — to percolate is to strain liquid through something, as coffee through a filter'],
        ['perfidious',3,'from Latin per + fides (faith) — a perfidious person is one who has thoroughly lost their faithfulness, betraying trust in a deep way'],
+       ['imperceptible',3,'from Latin in + per + capere (to take) — not able to be taken in thoroughly; too subtle to perceive'],
+       ['pergola',3,'from Italian pergola, from Latin pergula (projecting roof) — the per- is the Latin prefix, meaning something that extends through or out from a structure'],
        ['perforate',4,'from Latin per + forare (to bore) — to perforate is to bore a hole through something, creating a passage from one side to the other'],
+       ['periwinkle',4,'from Latin pervinca, likely from pervincire — per (thoroughly) + vincire (to bind) — the plant that thoroughly binds and entwines as it creeps across the ground'],
        ['perspicacious',5,'from Latin per + specere (to look) + -acious (having the quality of) — a perspicacious person is one who has the quality of looking through things clearly, being insightful and perceptive'],
        ['perspicuity',5,'from Latin per + specere (to look) + -ity (quality of) — perspicuity is the quality of being clear and easy to understand, as if looking through something without distortion'],
      ],
@@ -547,20 +545,29 @@ const WORDS = [
         {word:'personnel', explanation:'from French personnel — not the Latin prefix per-'},
         {word:'personify', explanation:'from persona — not the Latin prefix per-'},
         {word:'persona', explanation:'from Latin persona (mask) — not the Latin prefix per-'},
-        {word:'periodic', explanation:'from Greek periodos — peri-/period is Greek, not Latin per-'},
-        {word:'period', explanation:'from Greek periodos — peri-/period is Greek, not Latin per-'},
+        {word:'personable', explanation:'from persona — not the Latin prefix per-'},
+        {word:'periodic', explanation:'from Greek periodos — peri- is Greek "around," not Latin per-'},
+        {word:'period', explanation:'from Greek periodos — peri- is Greek "around," not Latin per-'},
         {word:'perimeter', explanation:'from Greek peri- "around" + metron — not Latin per-'},
         {word:'periphery', explanation:'from Greek peri- "around" + pherein — not Latin per-'},
+        {word:'peripheral', explanation:'from Greek peri- "around" + pherein — not Latin per-'},
         {word:'periscope', explanation:'from Greek peri- "around" + skopein — not Latin per-'},
+        {word:'perinatal', explanation:'from Greek peri- "around" + Latin natalis — the peri- here is Greek, not Latin per-'},
+        {word:'perihelion', explanation:'from Greek peri- "around" + helios (sun) — Greek peri-, not Latin per-'},
+        {word:'perihelium', explanation:'from Greek peri- "around" + helios (sun) — Greek peri-, not Latin per-'},
+        {word:'peripatetic', explanation:'from Greek peri- "around" + patein (to walk) — Greek peri-, not Latin per-'},
+        {word:'pericardium', explanation:'from Greek peri- "around" + kardia (heart) — Greek peri-, not Latin per-'},
+        {word:'peristyle', explanation:'from Greek peri- "around" + stylos (column) — Greek peri-, not Latin per-'},
+        {word:'peristalsis', explanation:'from Greek peri- "around" + stellein (to compress) — Greek peri-, not Latin per-'},
         {word:'peril', explanation:'from Latin periculum — per- is not functioning as the productive prefix here'},
+        {word:'perilous', explanation:'from Latin periculum — same root as peril; per- is not the productive prefix here'},
+        {word:'perilously', explanation:'from Latin periculum — same root as peril; per- is not the productive prefix here'},
         {word:'perhaps', explanation:'from Old English per hæp/happ — not the Latin per- prefix'},
-        {word:'perfume', explanation:'from Old French parfumer — per- here is not the Latin "through" prefix'},
         {word:'persian', explanation:'proper noun (Persia) — unrelated to Latin per-'},
-        {word:'personable', explanation:'from persona — not the Latin prefix per-'},
         {word:'paper', explanation:'from Latin papyrus/Old English papyr — contains "per" by coincidence'},
         {word:'super', explanation:'from Latin super, "above" — not the Latin prefix per-'},
         {word:'whisper', explanation:'from Old English hwisprian — unrelated to Latin per-'},
-        {word:'hopper', explanation:'from Old English hoppre — reduplication; not Latin per-'},
+        {word:'hopper', explanation:'from Old English hoppre — not Latin per-'},
         {word:'camper', explanation:'camp + -er agent suffix — not Latin per-'},
         {word:'bumper', explanation:'from bump + -er — not Latin per-'},
         {word:'expert', explanation:'from Latin expertus — -pert is not the productive prefix per-'},
@@ -569,15 +576,14 @@ const WORDS = [
         {word:'jasper', explanation:'proper noun/rock name — unrelated to Latin per-'},
         {word:'temper', explanation:'from Latin temperare — root tem-, not prefix per-'},
         {word:'supper', explanation:'from Old French souper — not Latin per-'},
-        {word:'whispering', explanation:'derivative of whisper — unrelated to Latin per-'},
-        {word:'campery', explanation:'adjectival form of camper — not Latin per-'},
+        {word:'whispering', explanation:'from Old English hwisprian — unrelated to Latin per-'},
         {word:'imperial', explanation:'from Latin imperium — per is part of imper- root, not the prefix per-'},
         {word:'operator', explanation:'from Latin operari "to work" — per not functioning as prefix'},
         {word:'cooperate', explanation:'from Latin co- + operari "work" — not Latin per-'},
         {word:'temperance', explanation:'same root as temper (tem-) — not Latin per-'},
         {word:'periwig', explanation:'from French perruque — per- here is not Latin prefix'},
         {word:'peridot', explanation:'from Arabic/different origin — per not a Latin prefix'},
-        {word:'perspective', explanation:'that is the word itself!'}
+        {word:'perspective', explanation:'that is the word itself!'},
       ],     
      },
     {name:'SPEC-',meaning:'to look, to see',origin:'Latin specere, "to look, to see"',
@@ -666,12 +672,87 @@ const WORDS = [
     id:6,
     segments:[{text:'AB',ri:0},{text:'STRACT',ri:1}],
     roots:[
-      {name:'AB-',meaning:'away from, off, apart',origin:'Latin ab/abs, "away from, off"',
-       forms:['^ab','^abs'],
-       words:[['absent',1],['absolute',1],['absorb',1],['absurd',1],['abuse',1],['abrupt',1],['abnormal',1],['abstain',2],['abbreviate',2],['aberrant',2],['abhor',2],['abject',2],['abscond',2],['abstinence',2],['abrogate',3],['abstruse',3],['abstemious',3],['ablative',3],['abolish',1],['abridge',2]]},
-      {name:'TRACT-',meaning:'to drag, draw, pull',origin:'Latin trahere / tractum, "to drag, pull"',
-       forms:['tract','trail','treat','trait'],
-       words:[['attract',1],['contract',1],['distract',1],['extract',1],['retract',1],['subtract',1],['tractor',1],['traction',1],['trace',1],['trait',2],['treat',1],['treaty',2],['portrait',2],['protract',2],['detract',2],['intractable',3],['tractable',2],['contraction',1],['attraction',1],['distraction',1],['extraction',2],['subtraction',1],['retreat',1],['portray',2],['maltreat',2]]},
+      {name:'AB-', meaning:'away from, off, apart', origin:'Latin ab/abs, "away from, off"',
+ forms:['^ab','^abs'],
+ words:[
+   ['absent',1],
+   ['absolute',1,'from Latin ab + solvere (to loosen) — loosened away from restriction; unconditional'],
+   ['absorb',1,'from Latin ab + sorbere (to suck in) — to suck something away into itself'],
+   ['absurd',2,'from Latin ab + surdus (deaf) — to be so far away from reason that you might as well be deaf to it'],
+   ['abuse',1,'from Latin ab + usus (use) — to use something away from its intended purpose, or to use it up completely'],
+   ['abrupt',1,'from Latin ab + ruptus (broken) — to break away suddenly'],
+   ['abnormal',1,'from Latin ab + normalis (conforming to a standard) — away from the norm'],
+   ['abolish',1],
+   ['abduct',1,'from Latin ab + ducere (to lead) — to lead someone away by force'],
+   ['abstain',2],
+   ['abbreviate',3,'from Latin ab + breviare (to shorten) — to cut away length, to condense'],
+   ['aberrant',3,'from Latin ab + errare (to wander) — wandering away from the expected path'],
+   ['abhor',2,'from Latin ab + horrere (to shudder) — to recoil away from something with dread'],
+   ['abject',3,'from Latin ab + jacere (to throw) — thrown away, cast down to the lowest state'],
+   ['abscond',2,'from Latin ab + condere (to hide) — to hide oneself away, usually after wrongdoing'],
+   ['abstinence',2],
+   ['abridge',2,'from Latin ab + breviare (to shorten) — to cut away, to make shorter; related to abbreviate'],
+   ['abjure',4,'from Latin ab + jurare (to swear) — to swear away from, to formally renounce'],
+   ['abdicate',4,'from Latin ab + dicare (to proclaim) — to formally proclaim oneself away from a role or throne'],
+   ['absolve',2,'from Latin ab + solvere (to loosen) — to loosen away from blame or obligation'],
+   ['abrade',2,'from Latin ab + radere (to scrape) — to scrape away a surface'],
+   ['abrogate',3,'from Latin ab + rogare (to ask, propose a law) — to ask away a law; to formally abolish it'],
+   ['abstruse',3,'from Latin ab + trudere (to push) — pushed away from easy understanding; hard to grasp'],
+   ['abstemious',3,'from Latin abs + temetum (strong drink) — abstaining away from alcohol; self-restrained'],
+   ['ablative',3,'from Latin ab + latus (carried) — the Latin case that carries meaning away from the noun; denoting removal or separation'],
+   ['abominate',3,'from Latin ab + omen — to turn away from as a bad omen; to detest'],
+   ['abscission',4,'from Latin ab + scindere (to cut) — a cutting away; used in botany for how leaves fall'],
+ ],
+ exclude:[
+   {word:'abandon', explanation:'"abandon" is from Old French à bandon ("at jurisdiction") — the ab is not the Latin prefix'},
+   {word:'about', explanation:'"about" is from Old English abutan — the ab is not the Latin prefix'},
+   {word:'above', explanation:'"above" is from Old English abufan — not the Latin prefix ab-'},
+   {word:'able', explanation:'"able" is from Latin habilis (handy) — unrelated to the prefix ab-'},
+   {word:'aboard', explanation:'"aboard" is from Old English — not the Latin prefix ab-'},
+   {word:'abode', explanation:'"abode" is from Old English abidan — not the Latin prefix ab-'},
+   {word:'abyss', explanation:'"abyss" is from Greek abyssos — the a- is Greek, not Latin ab-'},
+   {word:'abysmal', explanation:'"abysmal" is from Greek abyssos — the a- is Greek, not Latin ab-'},
+   {word:'abstract', explanation:'that\'s the word itself!'},
+   {word:'abattoir', explanation:'"abattoir" is from French abattre, from Latin ad + battuere (to beat toward) — the ab- here is actually ad-, not the Latin prefix ab-'},
+ ],
+},
+      {name:'TRACT-', meaning:'to drag, draw, pull', origin:'Latin trahere / tractum, "to drag, pull"',
+ forms:['tract','trail','treat','trait'],
+ words:[
+   ['attract',1],
+   ['contract',1],
+   ['distract',1],
+   ['extract',1],
+   ['retract',2],
+   ['subtract',1],
+   ['tractor',1,'from Latin tractor (one who drags) — a vehicle for pulling things'],
+   ['traction',2,'from Latin tractio, from trahere — the act of pulling; the grip of a tire on the road'],
+   ['trace',2,'from Latin tractiare, frequentative of trahere — to draw a line, to follow a pulled path'],
+   ['treat',2,'from Old French traitier, from Latin tractare (to handle, manage) — a frequentative of trahere'],
+   ['retreat',2,'from Old French retraite, from Latin retrahere — to pull back, to draw away again'],
+   ['trait',2,'from French trait, from Latin tractus — something drawn out; originally a stroke of a pen, then a feature of character'],
+   ['treaty',2,'from Old French traité, from Latin tractatus — something handled or drawn up between parties'],
+   ['portrait',3,'from Old French portraire, from Latin protrahere (to draw forth) — to draw out the likeness of someone'],
+   ['portray',3,'from Old French portraire — same root as portrait; to draw forth a representation'],
+   ['protract',3,'from Latin pro + trahere — to draw forward in time; to prolong'],
+   ['detract',3,'from Latin de + trahere — to draw away from; to diminish'],
+   ['maltreat',2],
+   ['tractable',4,'from Latin tractabilis — able to be handled or drawn; manageable'],
+   ['intractable',3,'from Latin in + tractabilis — not able to be handled; stubbornly resistant'],
+   ['distraught',3,'an alteration of distract, from Latin distrahere (to pull in different directions) — the -ght ending came by analogy with words like caught and taught'],
+   ['distrait',4,'from French, from Latin distrahere — quietly pulled in different directions; absent-minded with worry; a more refined cousin of distraught'],
+   ['trail',2,'from Old French trailler, from Latin tragulare (to drag a net) — to drag behind; what is left when something is pulled through'],
+   ['entrails',3,'from Old French entrailles, from Latin interanea via *intranea — the parts dragged inward; the interior organs'],
+ ],
+ exclude:[
+   {word:'drag', explanation:'"drag" is from Old Norse/Old English — Germanic root, possibly related to trahere but the connection is disputed'},
+   {word:'draw', explanation:'"draw" is from Old English dragan — Germanic root, possibly related to trahere but the connection is disputed'},
+   {word:'street', explanation:'"street" ends in -treet, not the TRACT- root — from Latin strata (paved road)'},
+   {word:'threat', explanation:'"threat" is from Old English thrēat — not related to trahere'},
+   {word:'training', explanation:'"training" traces to Old French trainer (to drag) which does share a distant root, but it\'s too indirect to count here'},
+ ],
+},
+
     ],
     prompt:'AB- (away) + TRACT- (pull). Something pulled apart or drawn away that needs a name?',
   },
@@ -810,6 +891,16 @@ function calcScore() {
   });
   selfDiscovered.forEach(ri => { pts += 3; });
   return pts;
+}
+
+function calcMax() {
+  return today.roots.reduce((total, r) => {
+    const top20 = [...r.words]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 20)
+      .reduce((s, w) => s + w[1], 0);
+    return total + top20;
+  }, 0) + (today.roots.length * 3); // +3 self-discovery bonus per root
 }
 
 function save() {
@@ -1156,6 +1247,13 @@ async function submit() {
   if(!raw || raw.length < 2) return;
   document.getElementById('feedback-note').textContent = '';
 
+  // Target word check — engine-level, applies to every puzzle
+  const targetWord = today.segments.map(s => s.text).join('').toLowerCase();
+  if(raw === targetWord || stemWord(raw) === stemWord(targetWord)) {
+    showFb(`That's the word itself!`, 'bad');
+    return;
+  }
+
   // Already found? (exact or stemmed variant)
   const rawStem = stemWord(raw);
   for(let i=0;i<today.roots.length;i++) {
@@ -1261,15 +1359,15 @@ function updateStats() {
 
 function updateRankBar(score) {
   const RANKS = [
-    { label: 'Etymophiliac', min: 0.50 },
-    { label: 'Word Freak',   min: 0.41 },
-    { label: 'Philologist',  min: 0.33 },
-    { label: 'Wordy',        min: 0.20 },
-    { label: 'Root Hoarder', min: 0.10 },
-    { label: 'Word Curious', min: 0.05 },
+    { label: 'Etymophiliac', min: 0.68 },
+    { label: 'Word Freak',   min: 0.55 },
+    { label: 'Philologist',  min: 0.42 },
+    { label: 'Wordy',        min: 0.28 },
+    { label: 'Root Hoarder', min: 0.15 },
+    { label: 'Word Curious', min: 0.07 },
     { label: 'Etymophobe',   min: 0 },
   ];
-  const max = today.roots.reduce((t,r) => t + r.words.reduce((s,w) => s + w[1], 0), 0);
+  const max = calcMax();
   const overallPct = max > 0 ? score / max : 0;
   const rank = RANKS.find(r => overallPct >= r.min) || RANKS[RANKS.length-1];
   const rankIdx = RANKS.indexOf(rank);
@@ -1398,12 +1496,12 @@ function showResults() {
   const streakData = JSON.parse(localStorage.getItem('etymon_streak') || '{}');
   const streakCount = streakData.streak || 0;
   const streakLine = streakCount > 1 ? `\n🔥 ${streakCount} day streak` : '';
-  const maxScoreShare = today.roots.reduce((t,r)=>t+r.words.reduce((s,w)=>s+w[1],0),0);
+  const maxScoreShare = calcMax();
   const pctShare = maxScoreShare > 0 ? score / maxScoreShare : 0;
   const ranksShare = [
-    {label:'Etymophiliac',min:0.50},{label:'Word Freak',min:0.41},
-    {label:'Philologist',min:0.33},{label:'Wordy',min:0.20},
-    {label:'Root Hoarder',min:0.10},{label:'Word Curious',min:0.05},
+    {label:'Etymophiliac',min:0.68},{label:'Word Freak',min:0.55},
+    {label:'Philologist',min:0.42},{label:'Wordy',min:0.28},
+    {label:'Root Hoarder',min:0.15},{label:'Word Curious',min:0.07},
     {label:'Etymophobe',min:0},
   ];
   const rankShare = ranksShare.find(r=>pctShare>=r.min)||ranksShare[ranksShare.length-1];
@@ -1426,17 +1524,15 @@ function showResults() {
   if(coined) restoreCoined();
 
   // Ranking
-  const maxScore = today.roots.reduce((total, r) => {
-    return total + r.words.reduce((s, w) => s + w[1], 0);
-  }, 0);
+  const maxScore = calcMax();
   const pct = maxScore > 0 ? score / maxScore : 0;
   const ranks = [
-    { label: 'Etymophiliac', min: 0.50 },
-    { label: 'Word Freak',   min: 0.41 },
-    { label: 'Philologist',  min: 0.33 },
-    { label: 'Wordy',        min: 0.20 },
-    { label: 'Root Hoarder', min: 0.10 },
-    { label: 'Word Curious', min: 0.05 },
+    { label: 'Etymophiliac', min: 0.68 },
+    { label: 'Word Freak',   min: 0.55 },
+    { label: 'Philologist',  min: 0.42 },
+    { label: 'Wordy',        min: 0.28 },
+    { label: 'Root Hoarder', min: 0.15 },
+    { label: 'Word Curious', min: 0.07 },
     { label: 'Etymophobe',   min: 0 },
   ];
   const rank = ranks.find(r => pct >= r.min) || ranks[ranks.length-1];
@@ -1488,24 +1584,14 @@ function showCoinedCard() {
   document.getElementById('idef').value=coined.def;
   document.getElementById('iauthor').value=coined.author||'';
   document.getElementById('coined-word').textContent=coined.name;
-  document.getElementById('coined-def').textContent=`(n.) ${coined.def}`;
+  document.getElementById('coined-def').textContent=coined.def;
   document.getElementById('coined-card').classList.add('show');
 }
 
 function restoreCoined() {
   showCoinedCard();
-  if(voted){
-    document.getElementById('vote-btn').classList.add('voted');
-    document.getElementById('vote-note').textContent='You voted for this.';
-  }
+  if(voted){}
 }
-
-document.getElementById('vote-btn').addEventListener('click',()=>{
-  if(voted) return;
-  voted=true; save();
-  document.getElementById('vote-btn').classList.add('voted');
-  document.getElementById('vote-note').textContent='You voted for this.';
-});
 
 init();
 // Show hints for undiscovered roots on load
@@ -1516,19 +1602,25 @@ today.roots.forEach((_,i)=>{
 updateStats();
 
 // ── HELP MODAL ────────────────────────────────────────────────────
-document.getElementById('help-btn').addEventListener('click', () => {
+function openHelp() {
   document.getElementById('help-modal').style.display = 'flex';
-});
-document.getElementById('help-close').addEventListener('click', () => {
+}
+function closeHelp() {
   document.getElementById('help-modal').style.display = 'none';
-});
-document.getElementById('help-got-it').addEventListener('click', () => {
-  document.getElementById('help-modal').style.display = 'none';
-});
+  localStorage.setItem('etymon_seen_help', '1');
+}
+
+document.getElementById('help-btn').addEventListener('click', openHelp);
+document.getElementById('help-close').addEventListener('click', closeHelp);
+document.getElementById('help-got-it').addEventListener('click', closeHelp);
 document.getElementById('help-modal').addEventListener('click', e => {
-  if (e.target === document.getElementById('help-modal'))
-    document.getElementById('help-modal').style.display = 'none';
+  if (e.target === document.getElementById('help-modal')) closeHelp();
 });
+
+// Show automatically for first-time visitors
+if (!localStorage.getItem('etymon_seen_help')) {
+  openHelp();
+}
 </script>
 </body>
 </html>
