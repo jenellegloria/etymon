@@ -368,7 +368,8 @@ function getESTDateStr() {
 }
 
 const estDateStr = getESTDateStr();
-const dayIndex = Math.floor((new Date(estDateStr) - new Date(LAUNCH)) / 86400000);
+// Parse dates as noon UTC to avoid timezone/DST off-by-one errors
+const dayIndex = Math.floor((new Date(estDateStr + 'T12:00:00Z') - new Date(LAUNCH + 'T12:00:00Z')) / 86400000);
 const puzzleIndex = ((dayIndex % WORDS.length) + WORDS.length) % WORDS.length;
 const today = WORDS[puzzleIndex];
 const puzzleDay = dayIndex + 1; // 1-based day number shown to players
