@@ -833,7 +833,7 @@ const WORDS = [
    {word:'numbing', explanation:'"numbing" is from Old English niman (to take) — unrelated to Latin numerus or Greek nomos'},
  ],
 
-}
+},
     ],
     prompt:'ASTRO- (star) + NOMY (law). The law of the stars. Coin a word for something that could use a cosmic rule.',
   },
@@ -1022,8 +1022,7 @@ const WORDS = [
    {word:'contour', explanation:'"contour" is from Italian contorno, from Latin contra + tornare — the con- is from contra (against), not com-'},
    {word:'convex', explanation:'"convex" is from Latin convexus (vaulted) — com- functions as an intensifier here, not as "together with"'},
  ],
- prompt:'CO- (together). What do conspirators, colleagues, and constellations share?',
-}
+},
       {name:'HAER-', meaning:'to stick, cling, be attached', origin:'Latin haerere, "to stick, cling, be attached"; its frequentative haesitare, "to keep sticking, to be stuck" gave English hesitate',
  forms:['adher','coher','inher','hesit','adhes','cohes'],
  formExclude:['cohesit','inherits','inheritance','inherit'],
@@ -1084,7 +1083,7 @@ const WORDS = [
    {word:'hesychasm', explanation:'"hesychasm" is from Greek hesychos (still, quiet) — a tradition of silent prayer; unrelated to haerere'},
    {word:'hessonite', explanation:'"hessonite" is from Greek hesson (inferior) — a variety of garnet; unrelated to haerere'},
  ],
-}
+},
     ],
     prompt:'CO- (together) + HAER- (stick). What holds together but has no word yet?',
   },
@@ -1179,7 +1178,7 @@ const WORDS = [
    {word:'phial', explanation:'from Greek phialē (a flat bowl) — unrelated to philos; a phial is a small glass bottle'},
    {word:'phishing', explanation:'from English fishing with ph- spelling — entirely unrelated to Greek philos'},
  ],
-}
+},
 {name:'SOPHY-', meaning:'wisdom', origin:'Greek sophía (σοφία), from sophós (σοφός) meaning skilled, clever, wise', forms:['soph','sophy'],
  formExclude:['sophomore','sophmore','trophy','trophies','atrophy','atrophied','catastrophe','apostrophe','apostrophes','strophe','antistrophe','philosophy'],
  words:[
