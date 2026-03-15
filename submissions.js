@@ -29,7 +29,7 @@ const SUBMISSIONS = [
     coins: [
       { word: 'abtracterration', def: 'something pulled apart by wandering', author: 'september' },
       { word: 'abtractable', def: 'something easily drawn away', author: 'anonymous' },
-      { word: 'abstractanimity', def: 'having a mind that is easily drawn away from its task' author: 'Aegis B.'}
+      { word: 'abstractanimity', def: 'having a mind that is easily drawn away from its task', author: 'Aegis B.'}
     ],
   },
   {
