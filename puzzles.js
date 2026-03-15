@@ -633,7 +633,7 @@ const WORDS = [
     segments:[{text:'ASTRO',ri:0},{text:'NOMY',ri:1}],
     roots:[
       {name:'ASTRO-', meaning:'star', origin:'Greek astron (ἄστρον), related to aster (ἀστήρ); from PIE *h₂ster- (star), also giving Latin stella and Old English steorra',
- forms:['astro','astr','aster'],
+ forms:['^astro','^astr','^aster'],
  formExclude:['plaster','plasters','plastered','plastering','master','masters','mastered','mastering','masterful','masterly','mastery','masterpiece','masterclass','masterwork','masterplan','grandmaster','postmaster','headmaster','schoolmaster','toastmaster','quartermaster','webmaster','faster','fastest','blaster','blasters','blasted','blasting','blasts','forecaster','forecasters','forecasting','caster','casters','castor','casting','broadcaster','broadcasters','broadcasting','plasterboard','plasterwork','alabaster','alabasters','flabbergaster','flabbergasted','flabbergasting','nastier','nastiest','nastily','nastiness','pastern','pasterns','eastern','Eastern','northeastern','southeastern','northwestern','southwestern','easterners','Easter','Eastertide','Eastertime','pasture','pastures','pastoral','pastorals','pastorate','pastorates','pastoralism','pastoralist','pastoralists','pastor','pastors','pasta','pastas','paste','pastes','pasted','pasting','pastel','pastels'],
  words:[
    ['star',1,'from Old English steorra, from Proto-Germanic *sternô — the same ancient PIE root *h₂ster- as Greek astēr and Latin stella, all meaning star'],
