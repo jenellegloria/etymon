@@ -729,7 +729,7 @@ const WORDS = [
  ],
 },
       {name:'-NOMY', meaning:'law, distribution, management (of a domain)', origin:'Greek nomos (law, custom, district) from PIE *nem- (to allot, distribute, manage)', 
- forms:['nomy','nomic','nomous','nome','nomos','num'],
+ forms:['nomy$','nomic$','nomous$','^num'],
  formExclude:['gnome','gnomon','gnomic','onomat','onomastic','nomen','nomencl','misnomer','numero','genome','conundrum','nimble','numb'],
  words:[
    ['economy',1,'from Greek oikos (house) + nomos — originally the management of a household; now a whole nation\'s resources'],
