@@ -24,10 +24,12 @@ const SUBMISSIONS = [
 
   {
     id: 6,
-    topScore: 90,
-    mostWords: 60,
+    topScore: 91,
+    mostWords: 67,
     coins: [
       { word: 'abtracterration', def: 'something pulled apart by wandering', author: 'september' },
+      { word: 'abtractable', def: 'something easily drawn away', author: 'anonymous' },
+      { word: 'abstractanimity', def: 'having a mind that is easily drawn away from its task' author: 'Aegis B.'}
     ],
   },
   {
