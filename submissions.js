@@ -21,7 +21,15 @@
 const SUBMISSIONS = [
 
   // ↓↓↓ PASTE NEW ENTRIES AT THE TOP ↓↓↓
-
+  {
+    id: 7,
+    topScore: 88,
+    mostWords: 58,
+    coins: [
+      { word: 'astronomology', def: 'study of interstellar law', author: 'EP' },
+      { word: 'astronome', def: 'A unit of government in space', author: 'anonymous' },
+    ],
+  },
   {
     id: 6,
     topScore: 91,
@@ -29,7 +37,8 @@ const SUBMISSIONS = [
     coins: [
       { word: 'abtracterration', def: 'something pulled apart by wandering', author: 'september' },
       { word: 'abtractable', def: 'something easily drawn away', author: 'anonymous' },
-      { word: 'abstractanimity', def: 'having a mind that is easily drawn away from its task', author: 'Aegis B.'}
+      { word: 'abstractanimity', def: 'having a mind that is easily drawn away from its task', author: 'Aegis B.'},
+      { word: 'abstrail', def: 'the track or trail leading away from a site', author: 'Gammarad'},
     ],
   },
   {
