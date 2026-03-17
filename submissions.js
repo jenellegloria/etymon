@@ -22,12 +22,21 @@ const SUBMISSIONS = [
 
   // ↓↓↓ PASTE NEW ENTRIES AT THE TOP ↓↓↓
   {
+    id: 8,
+    topScore: 92,
+    mostWords: 123,
+    coins: [
+      { word: 'cohesitate', def: 'a mutual hesitation', author: 'anonymous'},
+    ],
+  },
+  {
     id: 7,
-    topScore: 88,
+    topScore: 96,
     mostWords: 58,
     coins: [
       { word: 'astronomology', def: 'study of interstellar law', author: 'EP' },
       { word: 'astronome', def: 'A unit of government in space', author: 'anonymous' },
+      { word: 'anomastrical', def: 'illegal with respect to stars', author: 'Gammarad'},
     ],
   },
   {
