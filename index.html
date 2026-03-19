@@ -370,6 +370,7 @@ const C = [
 
 // ── DAILY (midnight EST/EDT rollover) ────────────────────────────
 const LAUNCH = '2026-03-09'; // Day 1 = Monday March 9
+const TRACKER_URL = 'https://script.google.com/macros/s/AKfycbzb5t3r8WZggFX6j7OnGvvfoBArZJlZRYyZ3fW2zbIQ8eD7Xus6E8COdfEDZGVHKiZv/exec';
 
 // Returns today's date string (YYYY-MM-DD) in the America/New_York timezone,
 // so the puzzle flips at midnight EST/EDT regardless of the player's location.
@@ -937,7 +938,6 @@ document.getElementById('done-btn').addEventListener('click', () => {
   showResults();
 
   // Log score anonymously to Google Sheet
-  const TRACKER_URL = 'https://script.google.com/macros/s/AKfycbzb5t3r8WZggFX6j7OnGvvfoBArZJlZRYyZ3fW2zbIQ8eD7Xus6E8COdfEDZGVHKiZv/exec';
 
   const payload = {
     date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
@@ -1078,7 +1078,7 @@ document.getElementById('share-btn').addEventListener('click',()=>{
 
 // ── COIN A WORD ───────────────────────────────────────────────────
 
-document.getElementById('coin-btn').addEventListener('click', async ()=>{
+document.getElementById('coin-btn').addEventListener('click', ()=>{
   const name=document.getElementById('iname').value.trim();
   const def=document.getElementById('idef').value.trim();
   const author=document.getElementById('iauthor').value.trim();
@@ -1088,10 +1088,8 @@ document.getElementById('coin-btn').addEventListener('click', async ()=>{
 
   // Send to Google Sheet — fire and forget, don't block the UI
   try {
-    await fetch(TRACKER_URL, {
+    fetch(TRACKER_URL, {
       method: 'POST',
-      mode: 'no-cors',
-      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         type: 'coin',
         puzzleId: today.id,
@@ -1100,27 +1098,25 @@ document.getElementById('coin-btn').addEventListener('click', async ()=>{
         definition: def,
         author: author||'anonymous',
       }),
-    });
+    }).catch(()=>{});
   } catch(e) { /* submission failure is silent — player already sees their coined card */ }
 });
 
 // ── WORD SUGGESTIONS ──────────────────────────────────────────────
-document.getElementById('suggest-btn').addEventListener('click', async ()=>{
+document.getElementById('suggest-btn').addEventListener('click', ()=>{
   const word = document.getElementById('suggest-input').value.trim();
   const note = document.getElementById('suggest-note');
   if (!word) return;
 
   note.textContent = 'Sending...';
   try {
-    await fetch(TRACKER_URL, {
+    fetch(TRACKER_URL, {
       method: 'POST',
-      mode: 'no-cors',
-      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         type: 'suggestion',
         word: word,
       }),
-    });
+    }).catch(()=>{});
     document.getElementById('suggest-input').value = '';
     note.textContent = 'Thanks! We\'ll consider it. 🌟';
     setTimeout(() => { note.textContent = ''; }, 4000);
