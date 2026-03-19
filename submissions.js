@@ -21,6 +21,22 @@
 const SUBMISSIONS = [
 
   // ↓↓↓ PASTE NEW ENTRIES AT THE TOP ↓↓↓
+    {
+    id: 10,
+    topScore: 72,
+    mostWords: 54,
+    coins: [
+      { word: 'abslocution', def: 'a piece of meaning that has been pulled apart from its spoken expression', author: 'anonymous'},
+    ],
+  },
+  {
+    id: 9,
+    topScore: 98,
+    mostWords: 42,
+    coins: [
+      { word: 'philosophobia', def: 'a fear of philosophy', author: 'anonymous'},
+    ],
+  },
   {
     id: 8,
     topScore: 92,

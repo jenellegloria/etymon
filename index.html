@@ -310,7 +310,17 @@
 
   <div class="res-bd" id="res-bd"></div>
   <div class="next-note" id="next-note"></div>
-</div>
+
+  <!-- WORD SUGGESTION BOX -->
+  <div id="suggestion-box" style="width:100%;max-width:400px;margin-top:1.2rem;padding-top:1.2rem;border-top:1px solid var(--border);text-align:center;">
+    <div style="font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-light);margin-bottom:.4rem;">Suggest a future word</div>
+    <div style="display:flex;gap:.4rem;">
+      <input id="suggest-input" type="text" placeholder="e.g. CHRYSANTHEMUM" style="flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:6px;color:var(--ink);font-family:'DM Sans',sans-serif;font-size:.84rem;padding:.5rem .7rem;outline:none;" />
+      <button id="suggest-btn" style="font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:500;padding:.5rem .9rem;border-radius:6px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer;white-space:nowrap;transition:all .15s;">Submit</button>
+    </div>
+    <div id="suggest-note" style="font-size:.7rem;color:var(--ink-light);font-style:italic;margin-top:.4rem;min-height:1rem;"></div>
+  </div>
+  </div>
 
 <!-- WORD TIP MODAL -->
 <div id="word-tip">
@@ -1067,6 +1077,7 @@ document.getElementById('share-btn').addEventListener('click',()=>{
 });
 
 // ── COIN A WORD ───────────────────────────────────────────────────
+
 document.getElementById('coin-btn').addEventListener('click', async ()=>{
   const name=document.getElementById('iname').value.trim();
   const def=document.getElementById('idef').value.trim();
@@ -1075,19 +1086,47 @@ document.getElementById('coin-btn').addEventListener('click', async ()=>{
 
   coined={name,def,author}; save(); showCoinedCard();
 
-  // Send to Formspree — fire and forget, don't block the UI
+  // Send to Google Sheet — fire and forget, don't block the UI
   try {
-    await fetch('https://formspree.io/f/mojkjjwb', {
+    await fetch(TRACKER_URL, {
       method: 'POST',
-      headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+      mode: 'no-cors',
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
+        type: 'coin',
+        puzzleId: today.id,
+        puzzleWord: today.segments.map(s=>s.text).join(''),
         word: name,
         definition: def,
         author: author||'anonymous',
-        puzzle: `№${puzzleDay} — ${today.segments.map(s=>s.text).join('')}`,
       }),
     });
   } catch(e) { /* submission failure is silent — player already sees their coined card */ }
+});
+
+// ── WORD SUGGESTIONS ──────────────────────────────────────────────
+document.getElementById('suggest-btn').addEventListener('click', async ()=>{
+  const word = document.getElementById('suggest-input').value.trim();
+  const note = document.getElementById('suggest-note');
+  if (!word) return;
+
+  note.textContent = 'Sending...';
+  try {
+    await fetch(TRACKER_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        type: 'suggestion',
+        word: word,
+      }),
+    });
+    document.getElementById('suggest-input').value = '';
+    note.textContent = 'Thanks! We\'ll consider it. 🌟';
+    setTimeout(() => { note.textContent = ''; }, 4000);
+  } catch(e) {
+    note.textContent = 'Something went wrong — try again?';
+  }
 });
 
 function showCoinedCard() {
