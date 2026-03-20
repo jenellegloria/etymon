@@ -1667,13 +1667,12 @@ const WORDS = [
       {name:'TELE-', meaning:'far off, at a distance', origin:'Greek τηλε (tēle), meaning far off, at a distance; from PIE *kwel- (to turn, to move around) or possibly from *tele- (lifting, bearing far)', forms:['tele'],
  formExclude:['teleost','teleodon','teleology','teleological','teleologist','teleon','teleos','telepher'],
  words:[
-   ['telephone',1,''],
-   ['television',1,''],
-   ['telescope',1,''],
-   ['telegram',1,''],
-   ['telegraph',1,''],
+   ['telephone',1,'from Greek tele (far) + phone (voice/sound) — a device for transmitting sound over a distance'],
+   ['television',1,'from Greek tele (far) + vision (seeing) — a device for transmitting images over a distance'],
+   ['telescope',1,'from Greek tele (far) + skopein (to look) — a device for viewing distant objects'],
+   ['telegram',1,'from Greek tele (far) + gram (writing) — a message sent over a distance'],
+   ['telegraph',2,'from Greek tele (far) + graphein (to write) — a system for transmitting messages over a distance'],
    ['telepathy',2,'from Greek tele (far) + pathos (feeling) — sensing feelings at a distance'],
-   ['telescope',1,''],
    ['telecast',2,''],
    ['teleconference',2,''],
    ['telework',2,''],
@@ -1691,7 +1690,6 @@ const WORDS = [
    ['telephoto',3,'a lens that magnifies distant objects'],
    ['teletext',3,'a system broadcasting text and graphics to television screens from a distance'],
    ['telex',3,'from tele(typewriter) + ex(change) — a global telegraphic communication system at a distance'],
-   ['teleology',4,'from Greek tele (end, purpose) — NOTE: this derives from Greek telos (end/purpose), NOT tele (far); but included as a common confusion'],
    ['telemeter',3,'an instrument for measuring distances or transmitting measurements from afar'],
    ['telemark',4,'from Telemark, Norway — a skiing technique; named after a far Norwegian region (proper noun origin)'],
    ['telepresence',3,'the sense of being present at a distant location through technology'],
@@ -1701,7 +1699,6 @@ const WORDS = [
    ['telekinetic',3,'relating to the supposed ability to move objects at a distance by mental force'],
    ['telethon',3,'from tele (far, as in television) + (mara)thon — a long-distance broadcast fundraiser'],
    ['teletransportation',4,'theoretical transportation of matter across distance by transmitting its information'],
-   ['teleological',4,'NOTE: from telos (end, purpose) not tele (far) — a common false friend'],
    ['telegenic',3,'from tele (television, far-broadcast) + genic (producing) — looking attractive on television'],
    ['telemetric',4,'relating to telemetry — measurement and transmission of data from a distance'],
    ['telencephalon',5,'from Greek tele (far, end) + enkephalon (brain) — the front/end portion of the brain; here tele may mean far/end'],
@@ -1740,6 +1737,7 @@ const WORDS = [
    {word:'teleost', explanation:'from Greek teleios (complete, perfect) + osteon (bone) — refers to complete-boned fish, not distance'},
    {word:'telpher', explanation:'from Greek telpher, ultimately from tele + pherein (to carry) — actually does derive partly from tele; borderline but the modern word is a proper noun/trade name'},
    {word:'telega', explanation:'from Russian telega (a type of wagon) — unrelated to Greek tele (far)'},
+   {word:'telomere', explanation:'from Greek telos (end) + meros (part) — not from tele (far)'},
  ],
 },
       
@@ -2032,5 +2030,5 @@ const WORDS = [
 
 
 
-  
+
 ];
