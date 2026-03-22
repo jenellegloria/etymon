@@ -21,7 +21,27 @@
 const SUBMISSIONS = [
 
   // ↓↓↓ PASTE NEW ENTRIES AT THE TOP ↓↓↓
-    {
+  {id: 13,
+    topScore: 101,
+    mostWords: 42,
+    coins: [
+      { word: 'stellescent', def: 'in the process of becoming a star', author: 'Allie' },
+    ],
+  }
+  {id: 12,
+    topScore: 99,
+    mostWords: 53,
+  },
+  
+  {
+    id: 11,
+    topScore: 53,
+    mostWords: 27,
+    coins: [
+      { word: 'hemeraphobia', def: 'a fear of days'},
+    ]
+  },
+  {
     id: 10,
     topScore: 72,
     mostWords: 54,
