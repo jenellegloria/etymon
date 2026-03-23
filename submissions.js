@@ -27,7 +27,7 @@ const SUBMISSIONS = [
     coins: [
       { word: 'stellescent', def: 'in the process of becoming a star', author: 'Allie' },
     ],
-  }
+  },
   {id: 12,
     topScore: 99,
     mostWords: 53,
