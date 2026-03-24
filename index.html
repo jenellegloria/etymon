@@ -340,6 +340,7 @@
   <div class="mt-hint" id="mt-hint"></div>
 </div>
 
+<script src="roots.js"></script>
 <script src="puzzles.js?v=2"></script>
 <script src="submissions.js?v=2"></script>
 <script>
@@ -479,6 +480,11 @@ function init() {
     if(seg.ri>=0) span.dataset.ri = seg.ri;
     tw.appendChild(span);
   });
+  // Scale font size so the word always fits on one line regardless of length.
+  // Formula: fit ~85% of viewport width; DM Sans 600 ≈ 0.68em per character.
+  { const chars = today.segments.reduce((n,s)=>n+s.text.length,0);
+    const vw = (85/(chars*0.68)).toFixed(1);
+    tw.style.fontSize = `clamp(1.4rem,${vw}vw,5rem)`; }
 
   // Pills
   const pp = document.getElementById('root-pills');
@@ -615,7 +621,7 @@ function showMilestone(ri) {
   document.getElementById('mt-body').innerHTML =
     `You've found <strong>20 words</strong> for <span style="color:${color};font-weight:700">${root.name}</span>. Common words no longer increase your score.`;
   document.getElementById('mt-hint').textContent =
-    `Try rarer variations — look for: ${forms}`;
+    root.milestone ? root.milestone : `Try rarer variations — look for: ${forms}`;
 
   const toast = document.getElementById('milestone-toast');
   toast.style.borderTop = `3px solid ${color}`;
@@ -702,11 +708,34 @@ function rootIndicesByForms(word) {
   const matches = [];
   for(let i=0;i<today.roots.length;i++) {
     const root = today.roots[i];
-    const matched = root.forms.some(f => new RegExp(f,'i').test(word));
-    if(!matched) continue;
-    // If the root has formExclude patterns, reject if any match
-    const excluded = (root.formExclude||[]).some(f => new RegExp(f,'i').test(word));
-    if(!excluded) matches.push(i);
+
+    // formExclude is ONLY checked against the original unstemmed word
+    const excluded = (root.formExclude||[]).some(ex => word.toLowerCase().includes(ex.toLowerCase()));
+    if(excluded) continue;
+
+    // Helper: test a candidate string against all forms
+    const testForms = (w) => root.forms.some(f => new RegExp(f,'i').test(w));
+
+    // 1. Try original word first
+    if(testForms(word)) { matches.push(i); continue; }
+
+    // 2. Try stripping common leading prefixes
+    const leadingPrefixes = ['under','over','out','non','mis','dis','un','in','im'];
+    let found = false;
+    for(const prefix of leadingPrefixes) {
+      if(word.toLowerCase().startsWith(prefix) && word.length > prefix.length + 3) {
+        if(testForms(word.slice(prefix.length))) { matches.push(i); found = true; break; }
+      }
+    }
+    if(found) continue;
+
+    // 3. Try stripping common trailing suffixes (longest-first to avoid partial stripping)
+    const trailingSuffixes = ['ically','ical','ally','ness','ment','tion','sion','ity','ous','ive','ful','less','ing','ed','er','est','ly','al','ic','ise','ize','ist','ism'];
+    for(const suffix of trailingSuffixes) {
+      if(word.toLowerCase().endsWith(suffix) && word.length > suffix.length + 3) {
+        if(testForms(word.slice(0,-suffix.length))) { matches.push(i); break; }
+      }
+    }
   }
   return matches;
 }
