@@ -21,6 +21,15 @@
 const SUBMISSIONS = [
 
   // ↓↓↓ PASTE NEW ENTRIES AT THE TOP ↓↓↓
+  {id: 15,
+    topScore: 33,
+    mostWords: 20,
+  },
+  {id: 14,
+    topScore: 88,
+    mostWords: 61,
+  },
+  
   {id: 13,
     topScore: 101,
     mostWords: 42,
