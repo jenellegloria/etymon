@@ -237,6 +237,49 @@
     font-style: italic;
   }
 
+  /* Play button */
+  .play-btn {
+    display: inline-block;
+    font-size: .75rem;
+    font-weight: 500;
+    color: var(--ink-mid);
+    text-decoration: none;
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    padding: .28rem .8rem;
+    transition: all .15s;
+    margin-bottom: 1rem;
+  }
+  .play-btn:hover { border-color: var(--ink-mid); color: var(--ink); }
+
+  /* Collapsible details */
+  .entry-details {
+    margin-top: .1rem;
+  }
+  .entry-details summary {
+    font-size: .68rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    cursor: pointer;
+    list-style: none;
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    user-select: none;
+  }
+  .entry-details summary::-webkit-details-marker { display: none; }
+  .entry-details summary::before {
+    content: '▸';
+    font-size: .6rem;
+    transition: transform .15s;
+  }
+  .entry-details[open] summary::before { transform: rotate(90deg); }
+  .entry-details-body {
+    margin-top: .75rem;
+  }
+
   .entry-note {
     margin-top: .85rem;
     font-size: .72rem;
@@ -386,7 +429,10 @@ function render() {
       </span>`;
     }).join('');
 
-    // Coined words HTML
+    // Play button — uses "./" instead of "index.html" so npx serve doesn't strip the query string on redirect
+    const playBtnHTML = `<a class="play-btn" href="./?puzzle=${sub.id}">Play →</a>`;
+
+    // Coined words HTML (inside collapsible details)
     let coinedHTML = '';
     if (sub.coins && sub.coins.length > 0) {
       const items = sub.coins.map(c => `
@@ -400,6 +446,9 @@ function render() {
     } else {
       coinedHTML = `<div class="coined-label">Words coined</div><div class="no-coins">None submitted yet.</div>`;
     }
+
+    // Root meanings (inside collapsible details)
+    const rootMeaningsHTML = `<div class="entry-roots" style="margin-bottom:.75rem">${rootsHTML}</div>`;
 
     // Stats HTML
     let statsHTML = '';
@@ -421,10 +470,16 @@ function render() {
       </div>
       <div class="entry-body">
         <div class="entry-word">${renderWord(puzzle)}</div>
-        <div class="entry-roots">${rootsHTML}</div>
-        ${coinedHTML}
-        ${statsHTML}
-        ${noteHTML}
+        ${playBtnHTML}
+        <details class="entry-details">
+          <summary>Show details</summary>
+          <div class="entry-details-body">
+            ${rootMeaningsHTML}
+            ${coinedHTML}
+            ${statsHTML}
+            ${noteHTML}
+          </div>
+        </details>
       </div>
     `;
 

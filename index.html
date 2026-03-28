@@ -219,6 +219,9 @@
 <div id="help-modal" style="display:none;position:fixed;inset:0;background:rgba(17,16,16,.5);z-index:400;align-items:center;justify-content:center;padding:1.5rem;">
   <div style="background:#FFFEF9;border-radius:14px;width:100%;max-width:420px;padding:1.8rem 1.8rem 1.5rem;position:relative;">
     <button id="help-close" style="position:absolute;top:.9rem;right:1rem;background:none;border:none;font-size:1.1rem;color:var(--ink-light);cursor:pointer;">✕</button>
+    <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:.6rem .85rem;margin-bottom:1rem;font-size:.82rem;color:#166534;line-height:1.5;">
+      🎉 <strong>New:</strong> Past puzzles are now playable! Visit the <a href="archive.html" style="color:#166534;font-weight:600;">Archive</a> to go back and play any puzzle you missed.
+    </div>
     <div style="font-size:.65rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-light);margin-bottom:.5rem;">How to play</div>
     <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:var(--ink);margin-bottom:.7rem;line-height:1.2;">Every word has roots.<br>Find them.</div>
     <div style="font-size:.88rem;color:var(--ink-mid);margin-bottom:1.2rem;line-height:1.6;">To play, type any word that feels like it has a shared history with the target word. You score points by finding <em>more</em> words with a shared root, especially <em>rare</em> ones. Good luck!</div>
@@ -382,10 +385,16 @@ function getESTDateStr() {
 const estDateStr = getESTDateStr();
 // Parse dates as noon UTC to avoid timezone/DST off-by-one errors
 const dayIndex = Math.floor((new Date(estDateStr + 'T12:00:00Z') - new Date(LAUNCH + 'T12:00:00Z')) / 86400000);
-const puzzleIndex = ((dayIndex % WORDS.length) + WORDS.length) % WORDS.length;
-const today = WORDS[puzzleIndex];
-const puzzleDay = dayIndex + 1; // 1-based day number shown to players
-const SK = `etymon_${estDateStr}`; // one save slot per EST calendar day
+const dailyPuzzleIndex = ((dayIndex % WORDS.length) + WORDS.length) % WORDS.length;
+const dailyPuzzle = WORDS[dailyPuzzleIndex];
+
+// Archive mode: ?puzzle=N loads any puzzle without affecting streak/stats.
+// Works for past puzzles and today's puzzle alike (today's just plays as a freebie, no streak/tracker).
+const _archiveParam = new URLSearchParams(window.location.search).get('puzzle');
+const archiveMode = !!_archiveParam && WORDS.some(w => w.id === +_archiveParam);
+const today = archiveMode ? WORDS.find(w => w.id === +_archiveParam) : dailyPuzzle;
+const puzzleDay = today.id; // 1-based puzzle number shown to players
+const SK = `etymon_${today.id}`; // one save slot per puzzle ID
 
 // ── STATE ────────────────────────────────────────────────────────
 let foundByRoot = {};   // ri -> [{word, pts}]
@@ -444,6 +453,7 @@ function load() {
 }
 
 function updateStreak() {
+  if (archiveMode) return 0; // archive plays don't affect the streak
   const data = JSON.parse(localStorage.getItem('etymon_streak') || '{}');
   const lastId = data.lastId || 0;
   const streak = data.streak || 0;
@@ -467,8 +477,20 @@ function updateStreak() {
 
 // ── INIT ─────────────────────────────────────────────────────────
 function init() {
-  document.getElementById('puzzle-label').textContent =
-    `№${puzzleDay} · ${new Date(estDateStr+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})}`;
+  // Compute the date for this puzzle (works for both daily and archive mode)
+  const puzzleDateObj = new Date(LAUNCH + 'T12:00:00Z');
+  puzzleDateObj.setUTCDate(puzzleDateObj.getUTCDate() + (today.id - 1));
+  const puzzleDateStr = puzzleDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  document.getElementById('puzzle-label').textContent = `№${puzzleDay} · ${puzzleDateStr}`;
+
+  // In archive mode, swap Archive link for a ← Archive back link
+  if (archiveMode) {
+    const archiveLink = document.querySelector('a[href="archive.html"]');
+    if (archiveLink) {
+      archiveLink.textContent = '← Archive';
+      archiveLink.title = 'Back to archive';
+    }
+  }
 
   // Word segments
   const tw = document.getElementById('target-word');
@@ -978,10 +1000,12 @@ document.getElementById('done-btn').addEventListener('click', () => {
     roots_total: today.roots.length,
   };
 
-  fetch(TRACKER_URL, {
-    method: 'POST',
-    body: JSON.stringify(payload),
-  }).catch(() => {}); // silent fail — never interrupts the game
+  if (!archiveMode) {
+    fetch(TRACKER_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }).catch(() => {}); // silent fail — never interrupts the game
+  }
 });
 
 
@@ -995,7 +1019,10 @@ function showResults() {
   const wordText = today.segments.map(s=>s.text).join('');
   const score = calcScore();
   const total = Object.values(foundByRoot).reduce((s,a)=>s+a.length,0);
-  const date = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  // Use the puzzle's actual date (not necessarily today) for the results display
+  const _resDateObj = new Date(LAUNCH + 'T12:00:00Z');
+  _resDateObj.setUTCDate(_resDateObj.getUTCDate() + (today.id - 1));
+  const date = _resDateObj.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
 
   document.getElementById('res-date').textContent = date;
   document.getElementById('res-word').textContent = wordText;
@@ -1093,9 +1120,14 @@ function showResults() {
     rankEl.style.display = 'block';
   }
 
-  const now=new Date(),tom=new Date(now);
-  tom.setDate(tom.getDate()+1);tom.setHours(0,0,0,0);
-  document.getElementById('next-note').textContent=`Next Etymon in ~${Math.ceil((tom-now)/3600000)} hours`;
+  if (archiveMode) {
+    document.getElementById('next-note').innerHTML =
+      `<a href="archive.html" style="color:var(--ink-mid);text-decoration:none;font-size:.82rem;">← Back to Archive</a>`;
+  } else {
+    const now=new Date(),tom=new Date(now);
+    tom.setDate(tom.getDate()+1);tom.setHours(0,0,0,0);
+    document.getElementById('next-note').textContent=`Next Etymon in ~${Math.ceil((tom-now)/3600000)} hours`;
+  }
 }
 
 document.getElementById('share-btn').addEventListener('click',()=>{
@@ -1205,7 +1237,7 @@ function openHelp() {
 }
 function closeHelp() {
   document.getElementById('help-modal').style.display = 'none';
-  localStorage.setItem('etymon_seen_help', '1');
+  localStorage.setItem('etymon_seen_help_v2', '1');
 }
 
 document.getElementById('help-btn').addEventListener('click', openHelp);
@@ -1216,7 +1248,7 @@ document.getElementById('help-modal').addEventListener('click', e => {
 });
 
 // Show automatically for first-time visitors
-if (!localStorage.getItem('etymon_seen_help')) {
+if (!localStorage.getItem('etymon_seen_help_v2')) {
   openHelp();
 }
 </script>
