@@ -1877,4 +1877,14 @@ const WORDS = [
     prompt: 'TRANS- (across, beyond) + FORM- (shape). To transform is to carry a thing across into a new shape entirely. Coin a word about crossing, shaping, or the act of becoming something new.',
   },
 
+  {
+    id: 20,
+    segments: [{ text: 'RE', ri: 0 }, { text: 'MEMBER', ri: 1 }],
+    roots: [
+      ROOTS['RE'],
+      ROOTS['MEMORARI'],
+    ],
+    prompt: 'RE- (back, again) + MEMBER- (memory). To remember is to bring back to mind.',
+  },
+
 ];

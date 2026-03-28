@@ -1,6 +1,5 @@
 // roots.js — shared root definitions
 // Each entry is a complete root object that can be referenced from puzzles.js.
-// Only roots used by MORE THAN ONE puzzle live here.
 // Roots used by a single puzzle stay inline in puzzles.js.
 //
 // Load order: roots.js → puzzles.js → submissions.js
@@ -261,6 +260,7 @@ const ROOTS = {
       ['comportment',4,'from Latin com- + portamentum — a carrying of oneself together, bearing'],
       // ── tier 5 ──────────────────────────────────────────────
       ['consanguine',5,'from Latin con + sanguis (blood) — of the same blood; the togetherness prefix at its most literal and ancient'],
+      ['consigliere',5,'you have been hiding in plain sight this whole time, haven\'t you?'],
     ],
     exclude: [
       { word: 'comedy', explanation: '"comedy" is from Greek kōmōidia — unrelated to Latin com-'},
@@ -1393,5 +1393,46 @@ const ROOTS = {
     ],
   },
 
+'MEMORARI': {
+  name:'MEMORARI', 
+  meaning:'call to mind', 
+  origin:'Latin memorari "be mindful of," from memor "mindful," from PIE root *(s)mer- (1) "to remember"', 
+  forms:['memor','memor','memoir','memoria','memori','member','membr','mement','remem','commemor'],
+  formExclude:['member','members','membership','membrane','membran','dismember','dismembr'],
+  words:[
+   ['memory',1,''],
+   ['remember',1,''],
+   ['memorial',2,''],
+   ['memorable',2,''],
+   ['memorize',2,''],
+   ['memoir',2,'from French mémoire, from Latin memoria — a record of what one calls to mind'],
+   ['memento',2,'from Latin memento "remember!" — imperative of meminisse, related to memor'],
+   ['commemorate',3,'from Latin commemorare "to call to mind together" — com- (together) + memorare'],
+   ['commemoration',3,''],
+   ['commemorative',3,''],
+   ['memorabilia',3,'from Latin memorabilia "things worth remembering" — plural of memorabilis'],
+   ['memorandum',3,'from Latin memorandum "thing to be remembered" — gerundive of memorare'],
+   ['immemorial',3,'from Latin immemorialis "beyond memory" — im- (not) + memorialis; as in "time immemorial"'],
+   ['memo',3,'short for memorandum — from Latin memorandum, gerundive of memorare'],
+   ['memos',3,'plural of memo — short for memoranda, from Latin memorare'],
+   ['memoranda',4,'plural of memorandum; from Latin gerundive of memorare — things to be called to mind'],
+   ['memorious',5,'from Latin memoriosus "having a good memory" — rare English adjective meaning retentive of memory'],
+   ['commemorator',4,'from Latin commemorator — one who calls to mind or commemorates'],
+   ['commemoratory',4,'from Latin commemoratorius — of or relating to commemoration'],
+   ['memoriter',4,'from Latin memoriter "from memory, by heart" — adverb used in academic and legal contexts'],
+ ],
+ exclude:[
+   {word:'member', explanation:'from Latin membrum "limb, body part" — unrelated to memor "mindful"'},
+   {word:'members', explanation:'from Latin membrum "limb, body part" — unrelated to memor "mindful"'},
+   {word:'membership', explanation:'from Latin membrum "limb, body part" — unrelated to memor "mindful"'},
+   {word:'membrane', explanation:'from Latin membrana "skin, parchment," from membrum "limb" — unrelated to memor'},
+   {word:'dismember', explanation:'from Latin membrum "limb" — to cut off limbs; unrelated to memor "mindful"'},
+   {word:'ember', explanation:'from Old English æmerge "ashes" — unrelated to Latin memor'},
+   {word:'memore', explanation:'reconstruction rather than attested English word — not a valid cognate'},
+   {word:'rememorize', explanation:'nonce formation without established etymological standing'},
+   {word:'memorist', explanation:'formed from Latin memoria + English -ist — not attested with sufficient standing'},
+ ],
 
+},
+  
 };
