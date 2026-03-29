@@ -1579,6 +1579,7 @@ const ROOTS = {
     ['withstands',2],
     ['withstanding',2],
     ['withstood',2],
+    ['stance',2, 'From Latin stania "a standing place," from stare "to stand" — a way of standing, a position on an issue'],
     ['outstanding',2,'literally "standing out" beyond others'],
     ['standstill',2],
     ['standoff',2],

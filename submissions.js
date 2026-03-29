@@ -21,9 +21,17 @@
 const SUBMISSIONS = [
 
   // ↓↓↓ PASTE NEW ENTRIES AT THE TOP ↓↓↓
+  {id: 20,
+    topScore: 81,
+    mostWords: 248,
+  },
+  
   {id: 19,
-    topScore: 103,
-    mostWords: 60,
+    topScore: 138,
+    mostWords: 111,
+    coins: [
+      { word: 'transformate', def: 'something that has taken new shape', author: 'september' },
+    ],
   },
   {id: 18,
     topScore: 116,
