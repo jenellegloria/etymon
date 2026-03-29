@@ -1887,4 +1887,14 @@ const WORDS = [
     prompt: 'RE- (back, again) + MEMBER- (memory). To remember is to bring back to mind.',
   },
 
+  {
+    id: 21,
+    segments: [{ text: 'UNDER', ri: 0 }, { text: 'STAND', ri: 1 }],
+    roots: [
+      ROOTS['UNDER'],
+      ROOTS['STAND'],
+    ],
+    prompt: 'UNDER- (beneath, below) + STAND- (to stand). To understand is to stand under or beneath something, as in a deep comprehension.',
+  },
+
 ];
