@@ -1907,4 +1907,32 @@ const WORDS = [
     prompt: 'PRE- (before) + TEND- (to stretch). To pretend is to stretch before or in front of the truth. Coin a word about stretching, extending, or putting on a false front.',
   },
 
+  {
+    id: 23,
+    segments: [{ text: 'EX', ri: 0}, { text: 'POUND', ri: 1}],
+    roots: [
+      ROOTS['EX'],
+      ROOTS['PONERE'],
+    ],
+    prompt: 'EX- (out, from) + PONERE (to place). If these roots made you think of a word that REALLY needs to exist? Share it here.',
+  },
+
+  {id: 24,
+    segments: [{ text: 'NOST', ri: 0}, { text: 'ALGIA', ri: 1}],
+    roots: [
+      ROOTS['NOST'],
+      ROOTS['ALGIA'],
+    ],
+    prompt: 'NOST- (return, home) + ALGIA (pain). If these roots made you think of a word that REALLY needs to exist? Share it here.',
+  },
+
+  {id: 25,
+    segments: [{ text: 'A', ri: 0}, { text: 'WAKE', ri: 1}],
+    roots: [
+      ROOTS['A'],
+      ROOTS['WAKE'],
+    ],
+    prompt: 'A- (not, without) + WAKE (to watch, be awake). If these roots made you think of a word that REALLY needs to exist? Share it here.',
+  },
+
 ];
