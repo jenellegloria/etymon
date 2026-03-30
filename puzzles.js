@@ -1897,4 +1897,14 @@ const WORDS = [
     prompt: 'UNDER- (beneath, below) + STAND- (to stand). To understand is to stand under or beneath something, as in a deep comprehension.',
   },
 
+  {
+    id: 22,
+    segments: [{ text: 'PRE', ri: 0 }, { text: 'TEND', ri: 1 }],
+    roots: [
+      ROOTS['PRE'],
+      ROOTS['TEND'],
+    ],
+    prompt: 'PRE- (before) + TEND- (to stretch). To pretend is to stretch before or in front of the truth. Coin a word about stretching, extending, or putting on a false front.',
+  },
+
 ];
