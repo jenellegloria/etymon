@@ -1297,7 +1297,7 @@ if (!localStorage.getItem('etymon_seen_help_v2')) {
   const pauseStart = new Date('2026-04-02T12:00:00Z');
   const pauseEnd   = new Date('2026-04-17T12:00:00Z');
 
-  if (now >= pauseStart && now < pauseEnd) {
+  if (now >= pauseStart && now < pauseEnd && !archiveMode) {
     const modal = document.getElementById('pause-modal');
     modal.style.display = 'flex';
 
