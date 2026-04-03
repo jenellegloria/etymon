@@ -215,6 +215,43 @@
   </div>
 </header>
 
+<!-- PAUSE MODAL — shown between 2026-04-02 and 2026-04-17 EST -->
+<div id="pause-modal" style="display:none;position:fixed;inset:0;background:rgba(17,16,16,.6);z-index:500;align-items:center;justify-content:center;padding:1.5rem;">
+  <div style="background:#FFFEF9;border-radius:14px;width:100%;max-width:440px;padding:2rem 2rem 1.8rem;position:relative;">
+    <div style="font-size:.65rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-light);margin-bottom:.5rem;">Etymon</div>
+    <div style="font-family:'Instrument Serif',serif;font-size:1.5rem;color:var(--ink);margin-bottom:1.2rem;line-height:1.3;">Taking a short break.</div>
+
+    <div style="font-size:.84rem;color:var(--ink-mid);line-height:1.7;margin-bottom:1.1rem;">
+      <strong style="color:var(--ink);">pause</strong> <span style="font-style:italic;color:var(--ink-light);">(n.)</span> from Latin <em>pausa</em> "a halt, stop, cessation," from Greek <em>pausis</em> "stopping, ceasing"
+    </div>
+
+    <div style="font-size:.88rem;color:var(--ink-mid);line-height:1.7;margin-bottom:1.1rem;">
+      If you're here, thank you for playing. I'm sorry for no new puzzle today — I plan to resume <strong style="color:var(--ink);">April 17th</strong>.
+    </div>
+
+    <div style="font-size:.84rem;color:var(--ink-mid);line-height:1.7;margin-bottom:1.4rem;">
+      <strong style="color:var(--ink);">resume</strong> <span style="font-style:italic;color:var(--ink-light);">(v.)</span> from Latin <em>resumere</em> "take again, take up again," from <em>re-</em> "again" + <em>sumere</em> "to take"
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:.7rem;margin-bottom:1.5rem;">
+      <a href="archive.html" style="display:block;text-align:center;background:var(--ink);color:white;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.84rem;font-weight:500;padding:.7rem;text-decoration:none;">→ Play the Archive</a>
+      <button id="pause-suggest-btn" style="background:transparent;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.84rem;font-weight:500;padding:.7rem;cursor:pointer;color:var(--ink-mid);transition:all .15s;" onmouseover="this.style.borderColor='var(--ink)';this.style.color='var(--ink)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--ink-mid)'">→ Suggest a Word</button>
+    </div>
+
+    <!-- Inline suggestion form, hidden until button clicked -->
+    <div id="pause-suggest-form" style="display:none;border-top:1px solid var(--border);padding-top:1rem;">
+      <div style="font-size:.72rem;color:var(--ink-light);margin-bottom:.5rem;">What word should I build a puzzle around?</div>
+      <div style="display:flex;gap:.4rem;">
+        <input id="pause-suggest-input" type="text" placeholder="e.g. SYNTHESIS" style="flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:6px;color:var(--ink);font-family:'DM Sans',sans-serif;font-size:.84rem;padding:.5rem .7rem;outline:none;" />
+        <button id="pause-suggest-submit" style="font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:500;padding:.5rem .9rem;border-radius:6px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer;white-space:nowrap;">Submit</button>
+      </div>
+      <div id="pause-suggest-note" style="font-size:.7rem;color:var(--ink-light);font-style:italic;margin-top:.4rem;min-height:1rem;"></div>
+    </div>
+
+    <div style="text-align:center;font-size:.75rem;color:var(--ink-light);font-style:italic;">See you soon.</div>
+  </div>
+</div>
+
 <!-- HOW TO PLAY MODAL -->
 <div id="help-modal" style="display:none;position:fixed;inset:0;background:rgba(17,16,16,.5);z-index:400;align-items:center;justify-content:center;padding:1.5rem;">
   <div style="background:#FFFEF9;border-radius:14px;width:100%;max-width:420px;padding:1.8rem 1.8rem 1.5rem;position:relative;">
@@ -1251,6 +1288,46 @@ document.getElementById('help-modal').addEventListener('click', e => {
 if (!localStorage.getItem('etymon_seen_help_v2')) {
   openHelp();
 }
+
+// ── PAUSE MODAL ───────────────────────────────────────────────────
+// Show between 2026-04-02 and 2026-04-17 (EST), then disappears automatically
+(function() {
+  const estStr = getESTDateStr();
+  const now = new Date(estStr + 'T12:00:00Z');
+  const pauseStart = new Date('2026-04-02T12:00:00Z');
+  const pauseEnd   = new Date('2026-04-17T12:00:00Z');
+
+  if (now >= pauseStart && now < pauseEnd) {
+    const modal = document.getElementById('pause-modal');
+    modal.style.display = 'flex';
+
+    // Suggest a word toggle
+    document.getElementById('pause-suggest-btn').addEventListener('click', () => {
+      document.getElementById('pause-suggest-form').style.display = 'block';
+      document.getElementById('pause-suggest-input').focus();
+    });
+
+    // Submit suggestion
+    document.getElementById('pause-suggest-submit').addEventListener('click', () => {
+      const word = document.getElementById('pause-suggest-input').value.trim();
+      const note = document.getElementById('pause-suggest-note');
+      if (!word) return;
+      note.textContent = 'Sending...';
+      fetch(TRACKER_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ type: 'suggestion', word: word }),
+      }).then(() => {
+        document.getElementById('pause-suggest-input').value = '';
+        note.textContent = 'Thank you! 🌟';
+        setTimeout(() => { note.textContent = ''; }, 4000);
+      }).catch(() => {
+        note.textContent = 'Something went wrong — try again?';
+      });
+    });
+  }
+})();
 </script>
 
 <!-- © 2026 Jenelle Gloria. All rights reserved. etymon is licensed under CC BY-NC 4.0 -->

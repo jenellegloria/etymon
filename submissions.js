@@ -21,6 +21,32 @@
 const SUBMISSIONS = [
 
   // ↓↓↓ PASTE NEW ENTRIES AT THE TOP ↓↓↓
+  {id: 25,
+    topScore: 38,
+    mostWords: 19,
+    note: 'Thanks for playing! The game is now on pause.',
+  },
+  
+  {id: 24,
+    topScore: 52,
+    mostWords: 39,
+  },
+  
+  {id: 23,
+    topScore: 83,
+    mostWords: 55,
+  },
+  
+  {id: 22,
+    topScore: 89,
+    mostWords: 58,
+  },
+  
+  {id: 21,
+    topScore: 103,
+    mostWords: 110,
+  },
+  
   {id: 20,
     topScore: 81,
     mostWords: 248,
